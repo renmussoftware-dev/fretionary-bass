@@ -21,13 +21,26 @@ import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Purchases from 'react-native-purchases';
 import {
-  AppEventsLogger,
-  Settings,
-} from 'react-native-fbsdk-next';
-import {
   requestTrackingPermissionsAsync,
   getTrackingPermissionsAsync,
 } from 'expo-tracking-transparency';
+import { IS_EXPO_GO } from './nativeEnv';
+
+// The Meta SDK is a custom native module, absent in Expo Go. Lazy-require it so
+// importing this file never crashes the Expo Go sandbox; every helper below
+// no-ops when the SDK isn't available (Expo Go or load failure).
+type FbsdkModule = typeof import('react-native-fbsdk-next');
+let _fbsdk: FbsdkModule | null | undefined;
+function getFbsdk(): FbsdkModule | null {
+  if (_fbsdk !== undefined) return _fbsdk;
+  let mod: FbsdkModule | null = null;
+  if (!IS_EXPO_GO) {
+    try { mod = require('react-native-fbsdk-next'); }
+    catch { mod = null; }
+  }
+  _fbsdk = mod;
+  return mod;
+}
 
 const ATT_PROMPTED_KEY = 'fretionary_bass_att_prompted_v1';
 
@@ -45,15 +58,17 @@ let attRequestInFlight: Promise<void> | null = null;
 export async function initAnalytics(): Promise<void> {
   if (initialized) return;
   initialized = true;
+  const fb = getFbsdk();
+  if (!fb) return; // Expo Go / SDK unavailable — nothing to sync.
   try {
     // iOS: set advertiser tracking based on current ATT status (whatever it
     // is — we haven't necessarily prompted yet). The SDK will respect this.
     // Android: setAdvertiserTrackingEnabled is a no-op but safe to call.
     if (Platform.OS === 'ios') {
       const { status } = await getTrackingPermissionsAsync();
-      await Settings.setAdvertiserTrackingEnabled(status === 'granted');
+      await fb.Settings.setAdvertiserTrackingEnabled(status === 'granted');
     } else {
-      await Settings.setAdvertiserTrackingEnabled(true);
+      await fb.Settings.setAdvertiserTrackingEnabled(true);
     }
   } catch (e) {
     if (__DEV__) console.warn('[analytics] init error:', e);
@@ -83,15 +98,16 @@ export async function maybePromptATT(): Promise<void> {
       // 'unavailable' status on Android and older iOS, in which case there's
       // nothing to do — Settings.setAdvertiserTrackingEnabled was already
       // set during initAnalytics.
+      const fb = getFbsdk();
       const { status, canAskAgain } = await getTrackingPermissionsAsync();
       if (status === 'undetermined' && canAskAgain) {
         const result = await requestTrackingPermissionsAsync();
-        if (Platform.OS === 'ios') {
-          await Settings.setAdvertiserTrackingEnabled(result.status === 'granted');
+        if (Platform.OS === 'ios' && fb) {
+          await fb.Settings.setAdvertiserTrackingEnabled(result.status === 'granted');
         }
-      } else if (Platform.OS === 'ios') {
+      } else if (Platform.OS === 'ios' && fb) {
         // Status already settled in some prior session — sync the SDK to it.
-        await Settings.setAdvertiserTrackingEnabled(status === 'granted');
+        await fb.Settings.setAdvertiserTrackingEnabled(status === 'granted');
       }
 
       await AsyncStorage.setItem(ATT_PROMPTED_KEY, '1');
@@ -120,8 +136,10 @@ export async function maybePromptATT(): Promise<void> {
  * configured before this is called or setFBAnonymousID is a no-op.
  */
 export async function linkFacebookAnonymousIDToRevenueCat(): Promise<void> {
+  const fb = getFbsdk();
+  if (!fb) return; // No Meta SDK (Expo Go) — no anon ID to link.
   try {
-    const anonId = await AppEventsLogger.getAnonymousID();
+    const anonId = await fb.AppEventsLogger.getAnonymousID();
     if (anonId) {
       await Purchases.setFBAnonymousID(anonId);
     }
@@ -135,8 +153,10 @@ export async function linkFacebookAnonymousIDToRevenueCat(): Promise<void> {
 // and so we have one place to gate, mute, or rename events later.
 
 export function logTutorialComplete(): void {
+  const fb = getFbsdk();
+  if (!fb) return;
   try {
-    AppEventsLogger.logEvent(AppEventsLogger.AppEvents.CompletedTutorial);
+    fb.AppEventsLogger.logEvent(fb.AppEventsLogger.AppEvents.CompletedTutorial);
   } catch (e) {
     if (__DEV__) console.warn('[analytics] logTutorialComplete error:', e);
   }
@@ -144,10 +164,12 @@ export function logTutorialComplete(): void {
 
 /** Fires when the paywall mounts — Meta uses this for retargeting. */
 export function logPaywallView(): void {
+  const fb = getFbsdk();
+  if (!fb) return;
   try {
-    AppEventsLogger.logEvent(AppEventsLogger.AppEvents.ViewedContent, {
-      [AppEventsLogger.AppEventParams.ContentType]: 'paywall',
-      [AppEventsLogger.AppEventParams.ContentID]: 'fretionary_bass_pro_paywall',
+    fb.AppEventsLogger.logEvent(fb.AppEventsLogger.AppEvents.ViewedContent, {
+      [fb.AppEventsLogger.AppEventParams.ContentType]: 'paywall',
+      [fb.AppEventsLogger.AppEventParams.ContentID]: 'fretionary_bass_pro_paywall',
     });
   } catch (e) {
     if (__DEV__) console.warn('[analytics] logPaywallView error:', e);
@@ -166,14 +188,16 @@ export function logInitiateCheckout(params: {
   currency: string;
   packageType: string;
 }): void {
+  const fb = getFbsdk();
+  if (!fb) return;
   try {
-    AppEventsLogger.logEvent(
-      AppEventsLogger.AppEvents.InitiatedCheckout,
+    fb.AppEventsLogger.logEvent(
+      fb.AppEventsLogger.AppEvents.InitiatedCheckout,
       params.price,
       {
-        [AppEventsLogger.AppEventParams.ContentID]: params.productId,
-        [AppEventsLogger.AppEventParams.ContentType]: params.packageType,
-        [AppEventsLogger.AppEventParams.Currency]: params.currency,
+        [fb.AppEventsLogger.AppEventParams.ContentID]: params.productId,
+        [fb.AppEventsLogger.AppEventParams.ContentType]: params.packageType,
+        [fb.AppEventsLogger.AppEventParams.Currency]: params.currency,
       },
     );
   } catch (e) {
