@@ -63,7 +63,7 @@ export default function OverlayScreen() {
 
       {/* Root note selector */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.noteRow}>
+        style={styles.noteScroll} contentContainerStyle={styles.noteRow}>
         {NOTES.map((note, i) => (
           <TouchableOpacity
             key={note}
@@ -211,8 +211,12 @@ const styles = StyleSheet.create({
     fontSize: 20, fontWeight: '700',
     color: COLORS.text, letterSpacing: -0.2,
   },
+  // flexGrow:0 keeps this horizontal scroller from expanding to fill the
+  // column's spare vertical space (which would stretch the pills tall).
+  noteScroll: { flexGrow: 0, flexShrink: 0 },
   noteRow: {
     flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: SPACE.lg,
     paddingBottom: SPACE.sm,
     gap: 6,
