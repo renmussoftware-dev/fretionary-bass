@@ -8,13 +8,14 @@ import PillSelector from '../../src/components/PillSelector';
 import { COLORS, SPACE, RADIUS, FONT_FAMILY } from '../../src/constants/theme';
 import {
   NOTES, NOTE_DISPLAY,
-  SCALES, CHORDS, CAGED_ORDER, CAGED_COLORS, CAGED_SHAPES,
+  SCALES, CAGED_ORDER, CAGED_COLORS, CAGED_SHAPES,
   CAGED_SHAPE_TIPS, POSITION_COLORS,
 } from '../../src/constants/music';
 import { useStore } from '../../src/store/useStore';
 import { getScalePositions, getCagedCaretFret } from '../../src/utils/theory';
 import { useProGate } from '../../src/hooks/useProGate';
 import { isScaleFree, isChordFree } from '../../src/constants/subscription';
+import { OVERLAY_CHORDS } from '../../src/utils/overlay';
 
 const LABEL_OPTIONS = [
   { label: 'Note', value: 'name' },
@@ -42,8 +43,11 @@ export default function FretboardScreen() {
     label: k, value: k,
   }));
 
-  const chordOptions = Object.keys(CHORDS).map(k => ({
-    label: k, value: k,
+  // Arpeggio view: the v1 chord set only (triads, sus, 6ths, 7ths) — no 9/11/13
+  // or altered extensions. Bass arpeggios target chord tones, and extensions
+  // are out of v1 scope (spec §9). Single source of truth shared with the hero.
+  const chordOptions = OVERLAY_CHORDS.map(c => ({
+    label: c.label, value: c.key,
   }));
 
   const posOptions = [
@@ -90,10 +94,10 @@ export default function FretboardScreen() {
             </ScrollView>
           </View>
         )}
-        {/* Chord selector */}
+        {/* Arpeggio (chord-tone) selector */}
         {mode === 'chords' && (
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Chord type</Text>
+            <Text style={styles.sectionLabel}>Arpeggio</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.pillRow}>
               {chordOptions.map(opt => {

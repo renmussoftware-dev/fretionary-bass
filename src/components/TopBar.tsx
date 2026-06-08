@@ -7,10 +7,13 @@ import { useProGate } from '../hooks/useProGate';
 import TuningPicker from './TuningPicker';
 import SavedSheet from './SavedSheet';
 
+// The 'chords' mode renders chord tones across the neck — i.e. an arpeggio —
+// so it's labeled "Arpeggio" for bass. Internal value stays 'chords' to avoid
+// churning the mode logic in the renderer and theory helpers.
 const MODES: { label: string; value: AppMode; pro?: boolean }[] = [
-  { label: 'Scales', value: 'scales' },
-  { label: 'Chords', value: 'chords' },
-  { label: 'Custom', value: 'custom', pro: true },
+  { label: 'Scales',   value: 'scales' },
+  { label: 'Arpeggio', value: 'chords' },
+  { label: 'Custom',   value: 'custom', pro: true },
 ];
 
 // Sliding indicator inside a segmented control. Animates between mode pills
