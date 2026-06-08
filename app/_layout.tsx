@@ -16,7 +16,7 @@ import Onboarding from '../src/components/Onboarding';
 import { initAnalytics, maybePromptATT, logTutorialComplete } from '../src/utils/analytics';
 import { useStore, PAYWALL_PROMPT_MIN_ACTIONS } from '../src/store/useStore';
 
-const ONBOARDING_KEY = 'fretionary_onboarded_v1';
+const ONBOARDING_KEY = 'fretionary_bass_onboarded_v1';
 const PROACTIVE_PAYWALL_DELAY_MS = 800;
 
 export default function RootLayout() {

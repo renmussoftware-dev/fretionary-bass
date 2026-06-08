@@ -4,23 +4,24 @@ import {
   useWindowDimensions, Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Circle, Line, Rect, Text as SvgText } from 'react-native-svg';
+import Svg, { Circle, Line, Text as SvgText } from 'react-native-svg';
 import { COLORS, SPACE, RADIUS } from '../constants/theme';
 
 interface Props {
   onDone: () => void;
 }
 
-const GOLD = '#E8D44D';
+const GOLD  = '#E8D44D';
 const RED    = '#D45846';
 const GREEN  = '#3FA08A';
 const BLUE   = '#5C8FCC';
-const PURPLE = '#6E60D9';
+const DIM    = '#3F3F47';
 
-// ── Mini fretboard illustration ──────────────────────────────────────────────
-function MiniFretboard({ dots }: { dots: { s: number; f: number; color: string; label: string }[] }) {
-  const W = 280, H = 100;
-  const L = 20, T = 14, FW = 38, SH = 14, NW = 4, FRETS = 6, STRS = 6;
+// ── Mini bass fretboard illustration (4 strings: G D A E, high→low) ──────────
+interface Dot { s: number; f: number; color: string; label?: string; dim?: boolean }
+function MiniFretboard({ dots }: { dots: Dot[] }) {
+  const W = 280, H = 92;
+  const L = 20, T = 16, FW = 38, SH = 18, NW = 4, FRETS = 6, STRS = 4;
   function fx(f: number) { return L + NW + f * FW - FW / 2; }
   function sy(s: number) { return T + s * SH; }
   return (
@@ -30,101 +31,23 @@ function MiniFretboard({ dots }: { dots: { s: number; f: number; color: string; 
         <Line key={f} x1={L + NW + f * FW} y1={T - 6} x2={L + NW + f * FW} y2={T + (STRS - 1) * SH + 6}
           stroke="#2E2E38" strokeWidth={f === 0 ? 3 : 1} />
       ))}
-      {/* String lines */}
+      {/* String lines — thicker toward the low E (bottom row) */}
       {Array.from({ length: STRS }).map((_, s) => (
         <Line key={s} x1={L} y1={sy(s)} x2={L + NW + FRETS * FW} y2={sy(s)}
-          stroke="#3A3A46" strokeWidth={1.5 - s * 0.15} />
+          stroke="#3A3A46" strokeWidth={1 + s * 0.5} />
       ))}
-      {/* Note dots */}
+      {/* Note dots — chord tones pop, scale tones sit dim */}
       {dots.map((d, i) => (
         <React.Fragment key={i}>
-          <Circle cx={fx(d.f)} cy={sy(d.s)} r={9} fill={d.color} />
-          <SvgText x={fx(d.f)} y={sy(d.s) + 4} textAnchor="middle"
-            fontSize={8} fontWeight="700" fill="#fff">{d.label}</SvgText>
+          <Circle cx={fx(d.f)} cy={sy(d.s)} r={d.dim ? 6 : 10} fill={d.color}
+            fillOpacity={d.dim ? 0.8 : 1} />
+          {d.label ? (
+            <SvgText x={fx(d.f)} y={sy(d.s) + 4} textAnchor="middle"
+              fontSize={9} fontWeight="700" fill="#fff">{d.label}</SvgText>
+          ) : null}
         </React.Fragment>
       ))}
     </Svg>
-  );
-}
-
-// ── Chord box illustration ────────────────────────────────────────────────────
-function MiniChordBox() {
-  const W = 120, H = 110;
-  const L = 20, T = 20, FW = 16, SH = 16, FRETS = 4, STRS = 6;
-  // G major chord shape
-  const dots = [
-    { s: 0, f: 2, color: GOLD },   // low E fret 3
-    { s: 1, f: 2, color: GREEN },  // A fret 2
-    { s: 2, f: 0, color: GREEN },  // D open
-    { s: 3, f: 0, color: GREEN },  // G open
-    { s: 4, f: 0, color: GREEN },  // B open
-    { s: 5, f: 3, color: GOLD },   // high e fret 3
-  ];
-  function fx(f: number) { return L + f * FW; }
-  function sy(s: number) { return T + s * SH; }
-  return (
-    <Svg width={W} height={H} viewBox={`0 0 ${W} ${H}`}>
-      {Array.from({ length: FRETS + 1 }).map((_, f) => (
-        <Line key={f} x1={fx(f)} y1={T} x2={fx(f)} y2={T + (STRS - 1) * SH}
-          stroke="#2E2E38" strokeWidth={f === 0 ? 3 : 1} />
-      ))}
-      {Array.from({ length: STRS }).map((_, s) => (
-        <Line key={s} x1={fx(0)} y1={sy(s)} x2={fx(FRETS)} y2={sy(s)}
-          stroke="#3A3A46" strokeWidth={1} />
-      ))}
-      {dots.map((d, i) => (
-        d.f > 0 ? (
-          <Circle key={i} cx={fx(d.f) - FW / 2} cy={sy(d.s)} r={6} fill={d.color} />
-        ) : (
-          <Circle key={i} cx={fx(0) - 10} cy={sy(d.s)} r={4} fill="none" stroke={d.color} strokeWidth={1.5} />
-        )
-      ))}
-      <SvgText x={fx(0) - 18} y={T - 8} fontSize={7} fill="#7a7870">G</SvgText>
-    </Svg>
-  );
-}
-
-// ── CAGED illustration ────────────────────────────────────────────────────────
-function MiniCaged() {
-  const shapes = [
-    { label: 'C', color: PURPLE, x: 0 },
-    { label: 'A', color: '#D85A30', x: 40 },
-    { label: 'G', color: GREEN, x: 80 },
-    { label: 'E', color: BLUE, x: 120 },
-    { label: 'D', color: '#BA7517', x: 160 },
-  ];
-  return (
-    <Svg width={200} height={52} viewBox="0 0 200 52">
-      {shapes.map((s, i) => (
-        <React.Fragment key={i}>
-          <Rect x={s.x} y={4} width={32} height={44} rx={6}
-            fill={s.color} fillOpacity={0.15} stroke={s.color} strokeWidth={1.5} />
-          <SvgText x={s.x + 16} y={32} textAnchor="middle"
-            fontSize={18} fontWeight="700" fill={s.color}>{s.label}</SvgText>
-        </React.Fragment>
-      ))}
-    </Svg>
-  );
-}
-
-// ── Progress bar illustration ─────────────────────────────────────────────────
-function MiniProgressions() {
-  const chords = ['I', 'IV', 'V', 'I'];
-  const colors = [GOLD, BLUE, GREEN, GOLD];
-  return (
-    <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
-      {chords.map((c, i) => (
-        <View key={i} style={{
-          width: 52, height: 52, borderRadius: 10,
-          backgroundColor: i === 0 ? colors[i] + '22' : 'rgba(255,255,255,0.04)',
-          borderWidth: i === 0 ? 2 : 1,
-          borderColor: i === 0 ? colors[i] : '#2E2E38',
-          alignItems: 'center', justifyContent: 'center',
-        }}>
-          <Text style={{ color: colors[i], fontSize: 18, fontWeight: '700' }}>{c}</Text>
-        </View>
-      ))}
-    </View>
   );
 }
 
@@ -132,37 +55,23 @@ function MiniProgressions() {
 const SLIDES = [
   {
     emoji: '🎸',
-    title: 'Welcome to\nFretionary',
-    subtitle: 'Your complete guitar theory companion — all on an interactive fretboard.',
+    title: 'Welcome to\nFretionary Bass',
+    subtitle: 'See exactly what to play over any chord — the strong notes, lit up right where your hand is, on your bass.',
     illustration: null,
     accent: GOLD,
   },
   {
     emoji: null,
-    title: 'The Fretboard',
-    subtitle: 'See any scale or chord mapped across the entire neck, in every key. Tap a note to hear it.',
-    illustration: 'fretboard',
+    title: 'Chord-Tone Overlay',
+    subtitle: 'Pick a chord and its root, 3rd, 5th and 7th light up across the neck — with the matching scale dimmed underneath.',
+    illustration: 'overlay',
     accent: GREEN,
   },
   {
     emoji: null,
-    title: 'Chord Library',
-    subtitle: '36 chord types with real fingering shapes and audio. Tap any chord to play it.',
-    illustration: 'chord',
-    accent: GOLD,
-  },
-  {
-    emoji: null,
-    title: 'CAGED System',
-    subtitle: 'See how the 5 shapes connect across the entire neck and unlock the fretboard.',
-    illustration: 'caged',
-    accent: PURPLE,
-  },
-  {
-    emoji: null,
-    title: 'Progressions',
-    subtitle: 'Play through 22 essential chord progressions with real guitar audio at any BPM.',
-    illustration: 'progressions',
+    title: 'Your Bass, Your Tuning',
+    subtitle: '4, 5 or 6 strings, standard or drop — the whole fretboard follows your tuning. Tap any note to hear it.',
+    illustration: 'fretboard',
     accent: BLUE,
   },
 ];
@@ -205,34 +114,30 @@ export default function Onboarding({ onDone }: Props) {
         <View style={styles.illustrationWrap}>
           {slide.emoji ? (
             <Text style={styles.emoji}>{slide.emoji}</Text>
+          ) : slide.illustration === 'overlay' ? (
+            <View style={styles.illustrationBox}>
+              {/* E minor 7 overlay: R / ♭3 / 5 / ♭7 lit, scale tones dimmed */}
+              <MiniFretboard dots={[
+                { s: 3, f: 0, color: GOLD,  label: 'R' }, // E
+                { s: 3, f: 3, color: RED,   label: '3' }, // G (♭3)
+                { s: 2, f: 2, color: GREEN, label: '5' }, // B
+                { s: 1, f: 0, color: BLUE,  label: '7' }, // D (♭7)
+                { s: 2, f: 0, color: DIM, dim: true },    // A
+                { s: 1, f: 2, color: DIM, dim: true },    // E
+                { s: 0, f: 0, color: DIM, dim: true },    // G
+                { s: 0, f: 2, color: DIM, dim: true },    // A
+              ]} />
+            </View>
           ) : slide.illustration === 'fretboard' ? (
             <View style={styles.illustrationBox}>
               <MiniFretboard dots={[
-                { s: 1, f: 2, color: GOLD, label: 'A' },
-                { s: 1, f: 4, color: RED, label: 'C' },
-                { s: 2, f: 2, color: GOLD, label: 'A' },
-                { s: 2, f: 3, color: GREEN, label: 'G' },
-                { s: 3, f: 2, color: GREEN, label: 'D' },
-                { s: 4, f: 2, color: GOLD, label: 'A' },
-                { s: 5, f: 1, color: BLUE, label: 'E' },
+                { s: 3, f: 0, color: GOLD,  label: 'E' },
+                { s: 2, f: 0, color: GREEN, label: 'A' },
+                { s: 1, f: 0, color: GREEN, label: 'D' },
+                { s: 0, f: 0, color: GREEN, label: 'G' },
+                { s: 3, f: 5, color: BLUE,  label: 'A' },
+                { s: 1, f: 2, color: RED,   label: 'E' },
               ]} />
-            </View>
-          ) : slide.illustration === 'chord' ? (
-            <View style={styles.illustrationBox}>
-              <MiniChordBox />
-              <View style={{ marginLeft: 24 }}>
-                <Text style={[styles.chordName, { color: slide.accent }]}>G Major</Text>
-                <Text style={styles.chordIntervals}>R · 3 · 5</Text>
-                <Text style={styles.chordDesc}>Bright and stable.</Text>
-              </View>
-            </View>
-          ) : slide.illustration === 'caged' ? (
-            <View style={styles.illustrationBox}>
-              <MiniCaged />
-            </View>
-          ) : slide.illustration === 'progressions' ? (
-            <View style={styles.illustrationBox}>
-              <MiniProgressions />
             </View>
           ) : null}
         </View>
@@ -282,12 +187,8 @@ const styles = StyleSheet.create({
   content:          { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 },
 
   illustrationWrap: { height: 160, alignItems: 'center', justifyContent: 'center', marginBottom: SPACE.xl },
-  illustrationBox:  { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: SPACE.lg, borderWidth: 1, borderColor: COLORS.border },
+  illustrationBox:  { alignItems: 'center', justifyContent: 'center', backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: SPACE.lg, borderWidth: 1, borderColor: COLORS.border },
   emoji:            { fontSize: 80 },
-
-  chordName:        { fontSize: 20, fontWeight: '700', marginBottom: 4 },
-  chordIntervals:   { fontSize: 13, color: COLORS.textMuted, marginBottom: 4 },
-  chordDesc:        { fontSize: 13, color: COLORS.textMuted },
 
   textWrap:         { alignItems: 'flex-start', width: '100%' },
   accentLine:       { width: 36, height: 3, borderRadius: 2, marginBottom: SPACE.md },
