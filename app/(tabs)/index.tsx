@@ -27,6 +27,17 @@ const ROLE_SWATCH: { role: string; color: { fill: string; stroke: string; text: 
   { role: '7th',   color: MUSIC_COLORS.extension, label: '7' },
 ];
 
+// Map a chord interval symbol (R, 3, ♭3, 5, ♯5, ♭7, ♭♭7, 2, 4, 6…) to a
+// written-out ordinal. The accidental is dropped because the note name beside
+// it already carries the actual pitch — so ♭3 and 3 both read "3rd".
+function intervalOrdinal(symbol: string): string {
+  if (symbol === 'R') return 'R';
+  const degree = parseInt(symbol.replace(/[♭♯♮]/g, ''), 10);
+  if (!degree || degree === 1) return 'R';
+  const suffix = degree === 2 ? 'nd' : degree === 3 ? 'rd' : 'th';
+  return `${degree}${suffix}`;
+}
+
 export default function OverlayScreen() {
   const {
     root, setRoot,
@@ -43,9 +54,12 @@ export default function OverlayScreen() {
   // Legend only shows the tones the active chord actually contains.
   const presentRoles = ROLE_SWATCH.filter((_, i) => i < (chord?.intervals.length ?? 3));
 
-  // Plain-language "what to play" line: chord degrees mapped to note names.
+  // Plain-language "what to play" line: each interval written out as an
+  // ordinal (R, 3rd, 5th, 7th…) followed by its note, e.g. "R: C#  3rd: F".
   const toneSummary = chord
-    ? chord.intervals.map((iv, i) => `${chord.intervalNames[i]} ${NOTES[(root + iv) % 12]}`).join('   ')
+    ? chord.intervals
+        .map((iv, i) => `${intervalOrdinal(chord.intervalNames[i])}: ${NOTES[(root + iv) % 12]}`)
+        .join('   ')
     : '';
 
   return (
