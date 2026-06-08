@@ -20,51 +20,37 @@ interface Section {
 
 const SECTIONS: Section[] = [
   {
-    title: 'Fretboard',
-    intro: 'The interactive neck — switch between scales, chords and CAGED views. Color-coded by interval (root / 3rd / 5th / extension).',
+    title: 'Chord-Tone Overlay',
+    intro: 'The hero view. Pick a root and chord and the strong notes — root, 3rd, 5th, 7th — light up across the neck, with the matching scale dimmed underneath. Tap any note to hear it.',
     navTo: '/',
+    navLabel: 'Open Overlay',
+    features: [
+      { name: 'Chord tones, color-coded', desc: 'Root, 3rd, 5th and 7th in distinct colors so the notes that lock with the chord pop.', badge: 'free' },
+      { name: 'Scale underlay',           desc: 'The suggested parent scale sits dimmed beneath the chord tones — toggle it on or off.', badge: 'free' },
+      { name: 'Position lock',            desc: 'Pin the overlay to a 4-fret window to see exactly what falls under your hand.', badge: 'free' },
+      { name: 'Note labels',              desc: 'Show intervals (R 3 5 7), note names, or hide labels.', badge: 'free' },
+      { name: 'Sixths, 7ths & altered',   desc: 'Triads are free; 6ths, 7ths and altered qualities unlock with Pro.', badge: 'mixed' },
+    ],
+  },
+  {
+    title: 'Fretboard',
+    intro: 'The reference neck — browse any scale or chord across the whole fretboard, in your tuning. Color-coded by interval (root / 3rd / 5th / extension).',
+    navTo: '/fretboard',
     navLabel: 'Open Fretboard',
     features: [
-      { name: 'Scales mode',     desc: '14 scales — Major, modes, pentatonics, blues, harmonic/melodic minor, whole-tone, diminished.', badge: 'mixed' },
-      { name: 'Chords mode',     desc: 'Light up any of 36 chord types across the entire neck.', badge: 'mixed' },
-      { name: 'CAGED mode',      desc: 'See where each of the 5 CAGED shapes lives for any key — with shape detail, caret-fret indicator, and pedagogical tips.', badge: 'mixed' },
-      { name: 'Position lock',   desc: 'Filter the fretboard to a single 5-fret position (Pos 1–5).', badge: 'pro' },
-      { name: 'Note labels',     desc: 'Toggle between note name, scale degree, interval, or no label.', badge: 'free' },
+      { name: 'Scales mode', desc: 'Scales and modes mapped across the neck — Major, the modes, pentatonics, blues, harmonic/melodic minor.', badge: 'mixed' },
+      { name: 'Chords mode', desc: 'Light up the tones of any chord across the entire neck.', badge: 'mixed' },
+      { name: 'Custom mode', desc: 'Hand-pick any set of notes to highlight on the neck.', badge: 'pro' },
+      { name: 'Note labels', desc: 'Toggle between note name, scale degree, interval, or no label.', badge: 'free' },
     ],
   },
   {
-    title: 'Chord Library',
-    intro: 'Browse every chord type with a real diagram, multiple voicings up the neck, and pedagogical resolution suggestions.',
-    navTo: '/chords',
-    navLabel: 'Open Chord Library',
+    title: 'Tunings',
+    intro: 'Pick your bass from the tuning picker — string count and every note on the neck follow it.',
     features: [
-      { name: 'Chord diagrams',         desc: 'Full box diagrams with multiple voicings — swipe to step through positions.', badge: 'mixed' },
-      { name: 'Resolution suggestions', desc: 'Each chord shows where it commonly resolves to with the voice-leading reason.', badge: 'free' },
-      { name: 'Tap to hear',            desc: 'Tap any chord to play it through your speakers.', badge: 'free' },
-    ],
-  },
-  {
-    title: 'Progressions',
-    intro: 'Learn and play 22 common chord progressions across genres, build diatonic sequences, or write your own.',
-    navTo: '/progressions',
-    navLabel: 'Open Progressions',
-    features: [
-      { name: 'Common progressions', desc: '22 famous progressions across pop, rock, jazz, blues, folk and more.', badge: 'mixed' },
-      { name: 'Diatonic builder',    desc: 'Pick any key and see all 7 diatonic chords.', badge: 'free' },
-      { name: 'Custom builder',      desc: 'Stack your own chord sequence.', badge: 'free' },
-      { name: 'Audio playback',      desc: 'Play progressions back at any BPM with auto-strumming.', badge: 'pro' },
-    ],
-  },
-  {
-    title: 'Practice',
-    intro: 'Sharpen your fretboard knowledge with interactive drills.',
-    navTo: '/practice',
-    navLabel: 'Open Practice',
-    features: [
-      { name: 'Name the Note', desc: 'A fret lights up — pick the right note from 7 (or 12) options.', badge: 'mixed' },
-      { name: 'Find the Note', desc: 'Show me a target note — tap every position of it on the neck.', badge: 'pro' },
-      { name: 'String Drill',  desc: 'Master one string at a time. Random fret positions, name the note.', badge: 'pro' },
-      { name: 'Difficulty levels', desc: 'Beginner (frets 0–5, naturals), Intermediate (full neck, all 12), Advanced (timed).', badge: 'mixed' },
+      { name: '4-String Standard', desc: 'E A D G — the universal bass tuning.', badge: 'free' },
+      { name: 'Drop D',            desc: 'D A D G — low string dropped for heavier riffs.', badge: 'free' },
+      { name: '5- & 6-string + more', desc: 'Low-B 5-string, 6-string, Eb, Drop C, BEAD, 5-string Drop A.', badge: 'pro' },
     ],
   },
   {
@@ -75,20 +61,11 @@ const SECTIONS: Section[] = [
     ],
   },
   {
-    title: 'Tunings',
-    intro: 'Switch the fretboard to alternate tunings via the picker on the Fretboard tab.',
-    features: [
-      { name: 'Standard',        desc: 'E A D G B E — the universal default.', badge: 'free' },
-      { name: 'Drop D',          desc: 'D A D G B E — heavy riffs and easy power chords.', badge: 'free' },
-      { name: '7 more tunings',  desc: 'Drop C, DADGAD, Open D / G / E, Eb Standard, D Standard.', badge: 'pro' },
-    ],
-  },
-  {
     title: 'Saved',
-    intro: 'Tap the heart on any chord, scale or progression to save it. Recents are auto-tracked. Access via the ♥ button on every tab.',
+    intro: 'Tap the heart on any chord or scale to save it. Recents are auto-tracked. Access via the ♥ button on the Fretboard tab.',
     features: [
       { name: 'Favorites', desc: 'Pin combos you keep coming back to.', badge: 'free' },
-      { name: 'Recents',   desc: 'Last 20 chords / scales / progressions you selected.', badge: 'free' },
+      { name: 'Recents',   desc: 'Last 20 chords / scales you selected.', badge: 'free' },
     ],
   },
 ];
@@ -109,9 +86,9 @@ export default function Guide() {
   return (
     <View style={styles.wrap}>
       <View style={styles.intro}>
-        <Text style={styles.welcome}>Welcome to Fretionary</Text>
+        <Text style={styles.welcome}>Welcome to Fretionary Bass</Text>
         <Text style={styles.welcomeSub}>
-          The fretboard dictionary. Every scale, chord, and progression — everywhere on the neck.
+          See what to play over any chord — the strong notes, right where your hand is, on your bass, in your tuning.
         </Text>
         {!isPro && (
           <View style={styles.proHint}>
