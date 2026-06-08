@@ -1,148 +1,102 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { Audio } from 'expo-av';
 import { Sound } from 'expo-av/build/Audio';
+import { getTuning } from '../constants/tunings';
 
-// ── String open-string MIDI notes (standard tuning) ──────────────────────────
-// String 0 = low E = MIDI 40, String 5 = high e = MIDI 64
-const OPEN_MIDI: number[] = [40, 45, 50, 55, 59, 64];
-
-// ── Map MIDI note → filename ──────────────────────────────────────────────────
-// Files use: C D Db E Eb F Gb G Ab A Bb B + octave
-const NOTE_NAMES = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
-
-function midiToFilename(midi: number): string {
-  const noteClass = midi % 12;
-  const octave = Math.floor(midi / 12) - 1;
-  return `${NOTE_NAMES[noteClass]}${octave}`;
-}
-
-// Preload only the guitar range: E2 (MIDI 40) to E5 (MIDI 64) + a few above
-const GUITAR_MIDI_MIN = 40; // E2 — low E open
-const GUITAR_MIDI_MAX = 76; // E5 — high e at fret 12
-
-// Build the require map statically — Metro bundler needs static requires
-const AUDIO_FILES: Record<string, any> = {
-  'A0':  require('../../assets/audio/A0.mp3'),
-  'A1':  require('../../assets/audio/A1.mp3'),
-  'A2':  require('../../assets/audio/A2.mp3'),
-  'A3':  require('../../assets/audio/A3.mp3'),
-  'A4':  require('../../assets/audio/A4.mp3'),
-  'A5':  require('../../assets/audio/A5.mp3'),
-  'A6':  require('../../assets/audio/A6.mp3'),
-  'Ab1': require('../../assets/audio/Ab1.mp3'),
-  'Ab2': require('../../assets/audio/Ab2.mp3'),
-  'Ab3': require('../../assets/audio/Ab3.mp3'),
-  'Ab4': require('../../assets/audio/Ab4.mp3'),
-  'Ab5': require('../../assets/audio/Ab5.mp3'),
-  'Ab6': require('../../assets/audio/Ab6.mp3'),
-  'B1':  require('../../assets/audio/B1.mp3'),
-  'B2':  require('../../assets/audio/B2.mp3'),
-  'B3':  require('../../assets/audio/B3.mp3'),
-  'B4':  require('../../assets/audio/B4.mp3'),
-  'B5':  require('../../assets/audio/B5.mp3'),
-  'B6':  require('../../assets/audio/B6.mp3'),
-  'Bb1': require('../../assets/audio/Bb1.mp3'),
-  'Bb2': require('../../assets/audio/Bb2.mp3'),
-  'Bb3': require('../../assets/audio/Bb3.mp3'),
-  'Bb4': require('../../assets/audio/Bb4.mp3'),
-  'Bb5': require('../../assets/audio/Bb5.mp3'),
-  'Bb6': require('../../assets/audio/Bb6.mp3'),
-  'C2':  require('../../assets/audio/C2.mp3'),
-  'C3':  require('../../assets/audio/C3.mp3'),
-  'C4':  require('../../assets/audio/C4.mp3'),
-  'C5':  require('../../assets/audio/C5.mp3'),
-  'C6':  require('../../assets/audio/C6.mp3'),
-  'D2':  require('../../assets/audio/D2.mp3'),
-  'D3':  require('../../assets/audio/D3.mp3'),
-  'D4':  require('../../assets/audio/D4.mp3'),
-  'D5':  require('../../assets/audio/D5.mp3'),
-  'D6':  require('../../assets/audio/D6.mp3'),
-  'Db2': require('../../assets/audio/Db2.mp3'),
-  'Db3': require('../../assets/audio/Db3.mp3'),
-  'Db4': require('../../assets/audio/Db4.mp3'),
-  'Db5': require('../../assets/audio/Db5.mp3'),
-  'Db6': require('../../assets/audio/Db6.mp3'),
-  'E2':  require('../../assets/audio/E2.mp3'),
-  'E3':  require('../../assets/audio/E3.mp3'),
-  'E4':  require('../../assets/audio/E4.mp3'),
-  'E5':  require('../../assets/audio/E5.mp3'),
-  'E6':  require('../../assets/audio/E6.mp3'),
-  'Eb2': require('../../assets/audio/Eb2.mp3'),
-  'Eb3': require('../../assets/audio/Eb3.mp3'),
-  'Eb4': require('../../assets/audio/Eb4.mp3'),
-  'Eb5': require('../../assets/audio/Eb5.mp3'),
-  'Eb6': require('../../assets/audio/Eb6.mp3'),
-  'F2':  require('../../assets/audio/F2.mp3'),
-  'F3':  require('../../assets/audio/F3.mp3'),
-  'F4':  require('../../assets/audio/F4.mp3'),
-  'F5':  require('../../assets/audio/F5.mp3'),
-  'F6':  require('../../assets/audio/F6.mp3'),
-  'G2':  require('../../assets/audio/G2.mp3'),
-  'G3':  require('../../assets/audio/G3.mp3'),
-  'G4':  require('../../assets/audio/G4.mp3'),
-  'G5':  require('../../assets/audio/G5.mp3'),
-  'G6':  require('../../assets/audio/G6.mp3'),
-  'Gb2': require('../../assets/audio/Gb2.mp3'),
-  'Gb3': require('../../assets/audio/Gb3.mp3'),
-  'Gb4': require('../../assets/audio/Gb4.mp3'),
-  'Gb5': require('../../assets/audio/Gb5.mp3'),
-  'Gb6': require('../../assets/audio/Gb6.mp3'),
+// ── Bass sample set (Jay-Bass Vintage Lite V2) ───────────────────────────────
+// Real recorded samples every 3 semitones, scientific pitch notation
+// (verified by FFT: C1 = MIDI 24, A2 = MIDI 45, …). Files are renamed to
+// `bass-<midi>.wav`. Any target note is at most 1 semitone from a sample
+// (except a few above the top sample), so pitch-shifting stays clean.
+//
+// Metro needs static requires, so the map is spelled out literally.
+const SAMPLE_FILES: Record<number, any> = {
+  24: require('../../assets/audio/bass-24.wav'), // C1
+  27: require('../../assets/audio/bass-27.wav'), // D#1
+  30: require('../../assets/audio/bass-30.wav'), // F#1
+  33: require('../../assets/audio/bass-33.wav'), // A1
+  36: require('../../assets/audio/bass-36.wav'), // C2
+  39: require('../../assets/audio/bass-39.wav'), // D#2
+  42: require('../../assets/audio/bass-42.wav'), // F#2
+  45: require('../../assets/audio/bass-45.wav'), // A2
+  48: require('../../assets/audio/bass-48.wav'), // C3
+  51: require('../../assets/audio/bass-51.wav'), // D#3
+  54: require('../../assets/audio/bass-54.wav'), // F#3
+  57: require('../../assets/audio/bass-57.wav'), // A3
+  60: require('../../assets/audio/bass-60.wav'), // C4
+  63: require('../../assets/audio/bass-63.wav'), // D#4 (top sample)
 };
 
-export function fretToMidi(stringIdx: number, fret: number): number {
-  return OPEN_MIDI[stringIdx] + fret;
+// Sorted list of the MIDI notes we actually have a sample for.
+const SAMPLE_MIDI = Object.keys(SAMPLE_FILES).map(Number).sort((a, b) => a - b);
+
+// Bass 4-string standard open MIDI, low→high — used by the legacy frets-array
+// chord helpers (the guitar-shaped chord/progression screens, parked for now).
+const LEGACY_OPEN_MIDI = [28, 33, 38, 43]; // E1 A1 D2 G2
+
+/** Nearest sampled note to a target MIDI — minimizes the pitch-shift distance. */
+function nearestSample(midi: number): number {
+  return SAMPLE_MIDI.reduce((best, m) =>
+    Math.abs(m - midi) < Math.abs(best - midi) ? m : best, SAMPLE_MIDI[0]);
 }
 
-// Convert a ChordVoicing frets array to MIDI notes
-// frets[0]=low E string, frets[5]=high e string
+/** Playback rate that shifts the base sample to the target pitch. */
+function rateForShift(targetMidi: number, sampleMidi: number): number {
+  return Math.pow(2, (targetMidi - sampleMidi) / 12);
+}
+
+// ── Legacy frets-array helpers (frets[0] = lowest string) ────────────────────
+export function fretToMidi(stringIdx: number, fret: number): number {
+  return (LEGACY_OPEN_MIDI[stringIdx] ?? LEGACY_OPEN_MIDI[0]) + fret;
+}
+
 export function fretstToMidiNotes(frets: (number | null)[]): number[] {
   const notes: number[] = [];
-  for (let s = 0; s < 6; s++) {
+  for (let s = 0; s < frets.length; s++) {
     const f = frets[s];
-    if (f !== null && f >= 0) {
-      notes.push(fretToMidi(s, f));
-    }
+    if (f !== null && f >= 0) notes.push(fretToMidi(s, f));
   }
   return notes;
 }
 
+/** MIDI for a fret on a render-row string (0 = highest string) of a tuning. */
+export function rowFretToMidi(tuningId: string, rowString: number, fret: number): number {
+  const open = [...getTuning(tuningId).midi].reverse(); // low→high → high→low rows
+  return (open[rowString] ?? open[0]) + fret;
+}
+
 export function useAudioEngine() {
-  const soundsRef = useRef<Record<string, Sound>>({});
+  const soundsRef = useRef<Record<number, Sound>>({});
   const loadedRef = useRef(false);
   const progressionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     async function loadAll() {
-      // Set audio mode first and wait for it to be fully active
       await Audio.setAudioModeAsync({
         playsInSilentModeIOS: true,
         allowsRecordingIOS: false,
         staysActiveInBackground: false,
         shouldDuckAndroid: true,
       });
-
-      // Small delay to let audio session fully activate on iPad
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      const loaded: Record<string, Sound> = {};
-
-      // Load in small batches to avoid overwhelming iPad audio session
-      const entries = Object.entries(AUDIO_FILES);
-      const BATCH_SIZE = 10;
+      const loaded: Record<number, Sound> = {};
+      const entries = Object.entries(SAMPLE_FILES);
+      const BATCH_SIZE = 6;
       for (let i = 0; i < entries.length; i += BATCH_SIZE) {
         const batch = entries.slice(i, i + BATCH_SIZE);
         await Promise.all(
-          batch.map(async ([name, src]) => {
+          batch.map(async ([midi, src]) => {
             try {
               const { sound } = await Audio.Sound.createAsync(
                 src,
-                { shouldPlay: false, volume: 1.0, progressUpdateIntervalMillis: 100 }
+                { shouldPlay: false, volume: 1.0, shouldCorrectPitch: false },
               );
-              loaded[name] = sound;
+              loaded[Number(midi)] = sound;
             } catch {
-              // skip missing files silently
+              // skip a sample that fails to load
             }
-          })
+          }),
         );
       }
       soundsRef.current = loaded;
@@ -151,48 +105,58 @@ export function useAudioEngine() {
     loadAll();
 
     return () => {
-      // Unload all sounds on unmount
       Object.values(soundsRef.current).forEach(s => s.unloadAsync());
       if (progressionTimerRef.current) clearTimeout(progressionTimerRef.current);
     };
   }, []);
 
+  // Play any MIDI note by pitch-shifting the nearest recorded sample. With
+  // shouldCorrectPitch=false the playback rate IS the transpose, so the timbre
+  // shifts naturally like a real string fretted up or down.
   const playMidi = useCallback(async (midi: number) => {
-    const name = midiToFilename(midi);
-    let sound = soundsRef.current[name];
+    const base = nearestSample(midi);
+    let sound = soundsRef.current[base];
 
-    // If sound wasn't loaded (iPad race condition), try loading it now
-    if (!sound && AUDIO_FILES[name]) {
+    if (!sound && SAMPLE_FILES[base]) {
       try {
-        await Audio.setAudioModeAsync({ playsInSilentModeIOS: true, allowsRecordingIOS: false, staysActiveInBackground: false });
-        const { sound: newSound } = await Audio.Sound.createAsync(
-          AUDIO_FILES[name], { shouldPlay: false, volume: 1.0 }
+        const { sound: s } = await Audio.Sound.createAsync(
+          SAMPLE_FILES[base], { shouldPlay: false, volume: 1.0, shouldCorrectPitch: false },
         );
-        soundsRef.current[name] = newSound;
-        sound = newSound;
+        soundsRef.current[base] = s;
+        sound = s;
       } catch {
         return;
       }
     }
-
     if (!sound) return;
+
+    const rate = rateForShift(midi, base);
     try {
-      await sound.setPositionAsync(0);
-      await sound.playAsync();
+      await sound.setStatusAsync({
+        positionMillis: 0,
+        rate,
+        shouldCorrectPitch: false,
+        shouldPlay: true,
+      });
     } catch {
       // ignore playback errors
     }
   }, []);
 
+  /** Tap-to-play a fret on a render-row string of the active tuning. */
+  const playFret = useCallback((tuningId: string, rowString: number, fret: number) => {
+    return playMidi(rowFretToMidi(tuningId, rowString, fret));
+  }, [playMidi]);
+
+  // Strum a frets-array voicing (legacy guitar/chord-screen shape) low→high.
   const playChord = useCallback(async (frets: (number | null)[]) => {
     const notes = fretstToMidiNotes(frets);
-    // Strum effect: slight delay between strings (low to high)
     await Promise.all(
       notes.map((midi, i) =>
         new Promise<void>(resolve => {
           setTimeout(() => { playMidi(midi).then(resolve); }, i * 18);
-        })
-      )
+        }),
+      ),
     );
   }, [playMidi]);
 
@@ -203,8 +167,7 @@ export function useAudioEngine() {
     }
   }, []);
 
-  // Play a sequence of chord fret arrays at a given BPM
-  // onStep(index) called as each chord plays
+  // Play a sequence of frets-array voicings at a given BPM (2 beats per chord).
   const playProgression = useCallback((
     chordFretsList: (number | null)[][],
     bpm: number,
@@ -212,14 +175,10 @@ export function useAudioEngine() {
     onFinish: () => void,
   ) => {
     stopProgression();
-    const msPerBeat = (60 / bpm) * 1000 * 2; // 2 beats per chord
+    const msPerBeat = (60 / bpm) * 1000 * 2;
     let idx = 0;
-
     function step() {
-      if (idx >= chordFretsList.length) {
-        onFinish();
-        return;
-      }
+      if (idx >= chordFretsList.length) { onFinish(); return; }
       onStep(idx);
       playChord(chordFretsList[idx]);
       idx++;
@@ -228,5 +187,5 @@ export function useAudioEngine() {
     step();
   }, [playChord, stopProgression]);
 
-  return { playMidi, playChord, playProgression, stopProgression };
+  return { playMidi, playFret, playChord, playProgression, stopProgression };
 }

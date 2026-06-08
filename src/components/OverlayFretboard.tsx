@@ -9,6 +9,7 @@ import { useStore } from '../store/useStore';
 import { getTuning, tuningNoteClasses } from '../constants/tunings';
 import { getScaleNotes } from '../utils/theory';
 import { getChordToneRoles, suggestScaleForChord, type ToneRole } from '../utils/overlay';
+import { useAudioEngine } from '../hooks/useAudioEngine';
 
 const TOTAL_FRETS = 15;
 const INLAY_FRETS = [3, 5, 7, 9, 12, 15];
@@ -34,6 +35,7 @@ export default function OverlayFretboard() {
   const isTablet = screenW >= 768;
 
   const { root, chordKey, labelMode, overlayUnderlay, overlayFret, tuningId } = useStore();
+  const { playFret } = useAudioEngine();
 
   const LEFT_PAD = isTablet ? 36 : 30;
   const TOP_PAD = isTablet ? 32 : 28;
@@ -198,7 +200,8 @@ export default function OverlayFretboard() {
               const r = DOT_R * scale * (isScale ? 0.82 : 1);
 
               return (
-                <G key={`${layer}-${s}-${f}`} opacity={opacity}>
+                <G key={`${layer}-${s}-${f}`} opacity={opacity}
+                  onPress={() => playFret(tuningId, s, f)}>
                   {isRoot && inRange && (
                     <Circle cx={x} cy={y} r={DOT_R + 6} fill="url(#overlayRootGlow)" />
                   )}
