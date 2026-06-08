@@ -9,9 +9,11 @@ export const NOTE_FLAT: Record<string, string> = {
   'C#': 'D♭', 'D#': 'E♭', 'F#': 'G♭', 'G#': 'A♭', 'A#': 'B♭',
 };
 
-// Standard tuning: e B G D A E (string 0 = high e)
-export const OPEN_STRINGS = [4, 11, 7, 2, 9, 4] as const;
-export const STRING_NAMES = ['e', 'B', 'G', 'D', 'A', 'E'] as const;
+// Bass standard tuning: G D A E (row 0 = highest string, high→low).
+// Used only as a fallback default; the live layout comes from the active
+// tuning's note classes (see constants/tunings.ts), which is string-count aware.
+export const OPEN_STRINGS = [7, 2, 9, 4] as const;
+export const STRING_NAMES = ['G', 'D', 'A', 'E'] as const;
 
 export const INTERVAL_NAMES = ['R', '♭2', '2', '♭3', '3', '4', '♭5', '5', '♭6', '6', '♭7', '7'];
 

@@ -60,7 +60,7 @@ export default function TuningPicker({ forcedStandard = false }: Props) {
               </TouchableOpacity>
             </View>
             <Text style={styles.subhead}>
-              Tuning affects scale notes on the fretboard. Chord library, progressions and CAGED always use standard tuning.
+              Tuning sets your string count and where every note lands on the neck — the overlay, scales and arpeggios all follow it.
             </Text>
             <ScrollView showsVerticalScrollIndicator={false}>
               {TUNINGS.map(t => {

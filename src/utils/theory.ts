@@ -27,10 +27,11 @@ export function getScalePositions(
   noteClasses: readonly number[] = OPEN_STRINGS,
 ) {
   const notes = getScaleNotes(root, scaleKey);
+  const strCount = noteClasses.length;
   const positions: { start: number; end: number }[] = [];
   for (let startFret = 0; startFret <= 15; startFret++) {
     let maxF = 0, minF = 99, count = 0;
-    for (let s = 0; s < 6; s++) {
+    for (let s = 0; s < strCount; s++) {
       for (let f = startFret; f <= startFret + 4; f++) {
         const n = (noteClasses[s] + f) % 12;
         if (notes.includes(n)) {

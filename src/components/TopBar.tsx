@@ -10,7 +10,6 @@ import SavedSheet from './SavedSheet';
 const MODES: { label: string; value: AppMode; pro?: boolean }[] = [
   { label: 'Scales', value: 'scales' },
   { label: 'Chords', value: 'chords' },
-  { label: 'CAGED',  value: 'caged'  },
   { label: 'Custom', value: 'custom', pro: true },
 ];
 

@@ -2,7 +2,7 @@
 // True near-black background with subtle warm tint, layered translucent
 // surfaces using rgba(255,255,255,0.0X) over a single warm-tinted base, and
 // 1px hairlines (6% opacity) instead of solid borders.
-export const APP_NAME = 'Fretionary';
+export const APP_NAME = 'Fretionary Bass';
 
 import { Dimensions, Platform } from 'react-native';
 

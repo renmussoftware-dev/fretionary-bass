@@ -1,15 +1,7 @@
 import { Tabs } from 'expo-router';
 import { View, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { COLORS, RADIUS } from '../../src/constants/theme';
-
-function TabIcon({ focused, children }: { focused: boolean; children: React.ReactNode }) {
-  return (
-    <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
-      {children}
-    </View>
-  );
-}
+import { COLORS } from '../../src/constants/theme';
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
@@ -38,35 +30,19 @@ export default function TabLayout() {
         },
       }}
     >
+      {/* HERO — chord-tone overlay, the default landing screen */}
       <Tabs.Screen
         name="index"
         options={{
+          title: 'Overlay',
+          tabBarIcon: ({ color }) => <OverlayIcon color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="fretboard"
+        options={{
           title: 'Fretboard',
-          tabBarIcon: ({ focused, color }) => (
-            <FretboardIcon color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="chords"
-        options={{
-          title: 'Chords',
-          tabBarIcon: ({ color }) => <ChordIcon color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="progressions"
-        options={{
-          title: 'Chords',
-          tabBarIcon: ({ color }) => <ProgressionsIcon color={color} />,
-          tabBarLabel: 'Progressions',
-        }}
-      />
-      <Tabs.Screen
-        name="practice"
-        options={{
-          title: 'Practice',
-          tabBarIcon: ({ color }) => <PracticeIcon color={color} />,
+          tabBarIcon: ({ color }) => <FretboardIcon color={color} />,
         }}
       />
       <Tabs.Screen
@@ -76,7 +52,28 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <ToolsIcon color={color} />,
         }}
       />
+
+      {/* Parked for later milestones (port to bass): chords/arpeggios,
+          progression stepper, practice drills. Hidden from the tab bar. */}
+      <Tabs.Screen name="chords" options={{ href: null }} />
+      <Tabs.Screen name="progressions" options={{ href: null }} />
+      <Tabs.Screen name="practice" options={{ href: null }} />
     </Tabs>
+  );
+}
+
+// Overlay icon: fretboard lines with a single lit chord-tone dot.
+function OverlayIcon({ color }: { color: string }) {
+  return (
+    <View style={{ width: 22, height: 16, justifyContent: 'space-between' }}>
+      {[0, 1, 2].map(i => (
+        <View key={i} style={{ height: 1.5, backgroundColor: color, borderRadius: 1, opacity: 0.6 }} />
+      ))}
+      <View style={{
+        position: 'absolute', right: 4, top: 5,
+        width: 6, height: 6, borderRadius: 3, backgroundColor: color,
+      }} />
+    </View>
   );
 }
 
@@ -85,43 +82,6 @@ function FretboardIcon({ color }: { color: string }) {
     <View style={{ width: 22, height: 16, justifyContent: 'space-between' }}>
       {[0, 1, 2].map(i => (
         <View key={i} style={{ height: 1.5, backgroundColor: color, borderRadius: 1 }} />
-      ))}
-    </View>
-  );
-}
-
-function ChordIcon({ color }: { color: string }) {
-  return (
-    <View style={{ width: 18, height: 18, position: 'relative' }}>
-      <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, borderWidth: 1.5, borderColor: color, borderRadius: 4 }} />
-      <View style={{ position: 'absolute', top: 5, left: 4, width: 10, height: 1.5, backgroundColor: color }} />
-      <View style={{ position: 'absolute', top: 10, left: 4, width: 10, height: 1.5, backgroundColor: color }} />
-    </View>
-  );
-}
-
-function PracticeIcon({ color }: { color: string }) {
-  // Concentric target — "drill / aim" semantics
-  return (
-    <View style={{ width: 18, height: 18, alignItems: 'center', justifyContent: 'center' }}>
-      <View style={{
-        width: 18, height: 18, borderRadius: 9,
-        borderWidth: 1.5, borderColor: color,
-      }} />
-      <View style={{
-        position: 'absolute',
-        width: 6, height: 6, borderRadius: 3,
-        backgroundColor: color,
-      }} />
-    </View>
-  );
-}
-
-function ProgressionsIcon({ color }: { color: string }) {
-  return (
-    <View style={{ flexDirection: 'row', gap: 3, alignItems: 'flex-end' }}>
-      {[8, 12, 10, 14].map((h, i) => (
-        <View key={i} style={{ width: 4, height: h * 0.9, backgroundColor: color, borderRadius: 2 }} />
       ))}
     </View>
   );

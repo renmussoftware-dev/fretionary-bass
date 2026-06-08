@@ -16,7 +16,6 @@ import { useStore } from '../store/useStore';
 import { getTuning, tuningNoteClasses, STANDARD_TUNING } from '../constants/tunings';
 
 const TOTAL_FRETS = 15;
-const STR_COUNT = 6;
 const INLAY_FRETS = [3, 5, 7, 9, 12, 15];
 
 // Visual treatment for in-position vs out-of-position notes.
@@ -38,13 +37,6 @@ export default function Fretboard() {
   const NUT_W = 8;
   const DOT_R = isTablet ? 17 : 14;
   const SVG_W = LEFT_PAD + NUT_W + TOTAL_FRETS * FRET_W + 18;
-  const SVG_H = TOP_PAD + (STR_COUNT - 1) * STR_H + 40;
-
-  function fretX(f: number) {
-    if (f === 0) return LEFT_PAD + NUT_W / 2;
-    return LEFT_PAD + NUT_W + f * FRET_W - FRET_W / 2;
-  }
-  function strY(s: number) { return TOP_PAD + s * STR_H; }
 
   const { root, scaleKey, chordKey, mode, labelMode, activePosition, activeCaged, tuningId, customNotes } = useStore();
 
@@ -52,6 +44,18 @@ export default function Fretboard() {
   const activeTuning = mode === 'caged' ? STANDARD_TUNING : getTuning(tuningId);
   const noteClasses = useMemo(() => tuningNoteClasses(activeTuning), [activeTuning]);
   const stringNames = activeTuning.stringNames;
+
+  // String count is data-driven (4 / 5 / 6) — drives every per-string layout
+  // calc below. The renderer makes no assumption about how many strings exist.
+  const STR_COUNT = activeTuning.stringCount;
+  const LAST_STR = STR_COUNT - 1;
+  const SVG_H = TOP_PAD + LAST_STR * STR_H + 40;
+
+  function fretX(f: number) {
+    if (f === 0) return LEFT_PAD + NUT_W / 2;
+    return LEFT_PAD + NUT_W + f * FRET_W - FRET_W / 2;
+  }
+  function strY(s: number) { return TOP_PAD + s * STR_H; }
 
   const activeNotes = useMemo(() => {
     if (mode === 'chords') return getChordNotes(root, chordKey);
@@ -169,16 +173,18 @@ export default function Fretboard() {
           </RadialGradient>
         </Defs>
 
-        {/* Inlay dots */}
+        {/* Inlay dots — positioned relative to the neck's vertical center so
+            they stay centered for any string count (4 / 5 / 6). */}
         {INLAY_FRETS.map(f => {
           const x = LEFT_PAD + NUT_W + f * FRET_W - FRET_W / 2;
+          const mid = LAST_STR / 2;
           if (f === 12) return (
             <G key={f}>
-              <Circle cx={x} cy={strY(1.5)} r={3.5} fill={inlayColor} />
-              <Circle cx={x} cy={strY(3.5)} r={3.5} fill={inlayColor} />
+              <Circle cx={x} cy={strY(mid - 1)} r={3.5} fill={inlayColor} />
+              <Circle cx={x} cy={strY(mid + 1)} r={3.5} fill={inlayColor} />
             </G>
           );
-          return <Circle key={f} cx={x} cy={strY(2.5)} r={3.5} fill={inlayColor} />;
+          return <Circle key={f} cx={x} cy={strY(mid)} r={3.5} fill={inlayColor} />;
         })}
 
         {/* Position highlight — soft gradient, no harsh outline */}
@@ -205,7 +211,7 @@ export default function Fretboard() {
                 x1={LEFT_PAD + NUT_W + cagedRange.caretFret * FRET_W - FRET_W / 2}
                 y1={strY(0) - 16}
                 x2={LEFT_PAD + NUT_W + cagedRange.caretFret * FRET_W - FRET_W / 2}
-                y2={strY(5) + 16}
+                y2={strY(LAST_STR) + 16}
                 stroke={col.fill} strokeWidth={1.5} strokeDasharray="5,4" strokeOpacity={0.6}
               />
             </G>
@@ -216,7 +222,7 @@ export default function Fretboard() {
         {Array.from({ length: TOTAL_FRETS }, (_, i) => i + 1).map(f => (
           <Line key={f}
             x1={LEFT_PAD + NUT_W + f * FRET_W} y1={strY(0) - 10}
-            x2={LEFT_PAD + NUT_W + f * FRET_W} y2={strY(5) + 10}
+            x2={LEFT_PAD + NUT_W + f * FRET_W} y2={strY(LAST_STR) + 10}
             stroke={f === 12 ? fretColorHL : fretColor} strokeWidth={1}
           />
         ))}

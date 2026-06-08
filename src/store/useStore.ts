@@ -52,6 +52,15 @@ interface AppState {
   tuningId: string;
   customNotes: number[];
 
+  // ── Chord-tone overlay (the hero) ──────────────────────────────────────────
+  // overlayUnderlay: draw the suggested parent scale dimmed under the chord
+  // tones. overlayFret: start fret of the 4-fret position window; null = whole
+  // neck (no position lock).
+  overlayUnderlay: boolean;
+  overlayFret: number | null;
+  setOverlayUnderlay: (v: boolean) => void;
+  setOverlayFret: (f: number | null) => void;
+
   favorites: SavedItem[];
   recents: SavedItem[];
 
@@ -100,13 +109,20 @@ export const useStore = create<AppState>()(
       scaleKey: 'Major',
       chordKey: 'Major',
       mode: 'scales',
-      labelMode: 'name',
+      // Interval labels by default — what teaches the fretboard and what bass
+      // references expect (spec §8).
+      labelMode: 'interval',
       activePosition: null,
       activeCaged: null,
       showAllFrets: false,
       isPro: false,
       tuningId: 'standard',
       customNotes: [],
+
+      overlayUnderlay: true,
+      overlayFret: null,
+      setOverlayUnderlay: (overlayUnderlay) => set({ overlayUnderlay }),
+      setOverlayFret: (overlayFret) => set({ overlayFret }),
 
       favorites: [],
       recents: [],
@@ -201,6 +217,8 @@ export const useStore = create<AppState>()(
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (s) => ({
         tuningId: s.tuningId,
+        labelMode: s.labelMode,
+        overlayUnderlay: s.overlayUnderlay,
         favorites: s.favorites,
         recents: s.recents,
         customNotes: s.customNotes,
