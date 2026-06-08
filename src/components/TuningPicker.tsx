@@ -8,20 +8,14 @@ import { useStore } from '../store/useStore';
 import { useProGate } from '../hooks/useProGate';
 import { isTuningFree } from '../constants/subscription';
 
-interface Props {
-  /** When true, the picker is shown but locked to standard (e.g. CAGED mode). */
-  forcedStandard?: boolean;
-}
-
-export default function TuningPicker({ forcedStandard = false }: Props) {
+export default function TuningPicker() {
   const { tuningId, setTuningId } = useStore();
   const { isPro, requirePro } = useProGate();
   const [open, setOpen] = useState(false);
 
-  const displayTuning = forcedStandard ? getTuning('standard') : getTuning(tuningId);
+  const displayTuning = getTuning(tuningId);
 
   function handleSelect(t: Tuning) {
-    if (forcedStandard) return; // shouldn't happen — picker disabled in this mode
     if (!isPro && !isTuningFree(t.id)) {
       requirePro(() => {
         setTuningId(t.id);
@@ -36,16 +30,16 @@ export default function TuningPicker({ forcedStandard = false }: Props) {
   return (
     <>
       <TouchableOpacity
-        onPress={() => !forcedStandard && setOpen(true)}
-        activeOpacity={forcedStandard ? 1 : 0.7}
-        style={[styles.button, forcedStandard && styles.buttonDisabled]}
+        onPress={() => setOpen(true)}
+        activeOpacity={0.7}
+        style={styles.button}
       >
         <Text style={styles.buttonLabel}>TUNING</Text>
         <View style={styles.buttonRight}>
           <Text style={styles.buttonValue} numberOfLines={1}>
             {displayTuning.shortName}
           </Text>
-          {!forcedStandard && <Text style={styles.buttonChevron}>⌄</Text>}
+          <Text style={styles.buttonChevron}>⌄</Text>
         </View>
       </TouchableOpacity>
 
@@ -107,7 +101,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bg,
     gap: 8,
   },
-  buttonDisabled: { opacity: 0.6 },
   buttonLabel: {
     fontSize: 9, fontWeight: '700', color: COLORS.textFaint,
     letterSpacing: 0.8,

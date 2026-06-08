@@ -30,10 +30,6 @@ const SAMPLE_FILES: Record<number, any> = {
 // Sorted list of the MIDI notes we actually have a sample for.
 const SAMPLE_MIDI = Object.keys(SAMPLE_FILES).map(Number).sort((a, b) => a - b);
 
-// Bass 4-string standard open MIDI, low→high — used by the legacy frets-array
-// chord helpers (the guitar-shaped chord/progression screens, parked for now).
-const LEGACY_OPEN_MIDI = [28, 33, 38, 43]; // E1 A1 D2 G2
-
 /** Nearest sampled note to a target MIDI — minimizes the pitch-shift distance. */
 function nearestSample(midi: number): number {
   return SAMPLE_MIDI.reduce((best, m) =>
@@ -45,20 +41,6 @@ function rateForShift(targetMidi: number, sampleMidi: number): number {
   return Math.pow(2, (targetMidi - sampleMidi) / 12);
 }
 
-// ── Legacy frets-array helpers (frets[0] = lowest string) ────────────────────
-export function fretToMidi(stringIdx: number, fret: number): number {
-  return (LEGACY_OPEN_MIDI[stringIdx] ?? LEGACY_OPEN_MIDI[0]) + fret;
-}
-
-export function fretstToMidiNotes(frets: (number | null)[]): number[] {
-  const notes: number[] = [];
-  for (let s = 0; s < frets.length; s++) {
-    const f = frets[s];
-    if (f !== null && f >= 0) notes.push(fretToMidi(s, f));
-  }
-  return notes;
-}
-
 /** MIDI for a fret on a render-row string (0 = highest string) of a tuning. */
 export function rowFretToMidi(tuningId: string, rowString: number, fret: number): number {
   const open = [...getTuning(tuningId).midi].reverse(); // low→high → high→low rows
@@ -67,8 +49,6 @@ export function rowFretToMidi(tuningId: string, rowString: number, fret: number)
 
 export function useAudioEngine() {
   const soundsRef = useRef<Record<number, Sound>>({});
-  const loadedRef = useRef(false);
-  const progressionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     async function loadAll() {
@@ -100,13 +80,11 @@ export function useAudioEngine() {
         );
       }
       soundsRef.current = loaded;
-      loadedRef.current = true;
     }
     loadAll();
 
     return () => {
       Object.values(soundsRef.current).forEach(s => s.unloadAsync());
-      if (progressionTimerRef.current) clearTimeout(progressionTimerRef.current);
     };
   }, []);
 
@@ -148,44 +126,5 @@ export function useAudioEngine() {
     return playMidi(rowFretToMidi(tuningId, rowString, fret));
   }, [playMidi]);
 
-  // Strum a frets-array voicing (legacy guitar/chord-screen shape) low→high.
-  const playChord = useCallback(async (frets: (number | null)[]) => {
-    const notes = fretstToMidiNotes(frets);
-    await Promise.all(
-      notes.map((midi, i) =>
-        new Promise<void>(resolve => {
-          setTimeout(() => { playMidi(midi).then(resolve); }, i * 18);
-        }),
-      ),
-    );
-  }, [playMidi]);
-
-  const stopProgression = useCallback(() => {
-    if (progressionTimerRef.current) {
-      clearTimeout(progressionTimerRef.current);
-      progressionTimerRef.current = null;
-    }
-  }, []);
-
-  // Play a sequence of frets-array voicings at a given BPM (2 beats per chord).
-  const playProgression = useCallback((
-    chordFretsList: (number | null)[][],
-    bpm: number,
-    onStep: (index: number) => void,
-    onFinish: () => void,
-  ) => {
-    stopProgression();
-    const msPerBeat = (60 / bpm) * 1000 * 2;
-    let idx = 0;
-    function step() {
-      if (idx >= chordFretsList.length) { onFinish(); return; }
-      onStep(idx);
-      playChord(chordFretsList[idx]);
-      idx++;
-      progressionTimerRef.current = setTimeout(step, msPerBeat);
-    }
-    step();
-  }, [playChord, stopProgression]);
-
-  return { playMidi, playFret, playChord, playProgression, stopProgression };
+  return { playMidi, playFret };
 }

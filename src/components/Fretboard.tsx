@@ -5,15 +5,14 @@ import Svg, {
 } from 'react-native-svg';
 import {
   NOTES, SCALES, CHORDS,
-  CAGED_COLORS, CAGED_ORDER, POSITION_COLORS, COLORS as MUSIC_COLORS,
+  POSITION_COLORS, COLORS as MUSIC_COLORS,
 } from '../constants/music';
 import { COLORS, FONT_FAMILY } from '../constants/theme';
 import {
-  getScaleNotes, getChordNotes, getScalePositions,
-  getCagedFretRange, noteLabel,
+  getScaleNotes, getChordNotes, getScalePositions, noteLabel,
 } from '../utils/theory';
 import { useStore } from '../store/useStore';
-import { getTuning, tuningNoteClasses, STANDARD_TUNING } from '../constants/tunings';
+import { getTuning, tuningNoteClasses } from '../constants/tunings';
 
 const TOTAL_FRETS = 15;
 const INLAY_FRETS = [3, 5, 7, 9, 12, 15];
@@ -38,10 +37,9 @@ export default function Fretboard() {
   const DOT_R = isTablet ? 17 : 14;
   const SVG_W = LEFT_PAD + NUT_W + TOTAL_FRETS * FRET_W + 18;
 
-  const { root, scaleKey, chordKey, mode, labelMode, activePosition, activeCaged, tuningId, customNotes } = useStore();
+  const { root, scaleKey, chordKey, mode, labelMode, activePosition, tuningId, customNotes } = useStore();
 
-  // CAGED is defined by standard-tuning open shapes — force standard for that mode.
-  const activeTuning = mode === 'caged' ? STANDARD_TUNING : getTuning(tuningId);
+  const activeTuning = getTuning(tuningId);
   const noteClasses = useMemo(() => tuningNoteClasses(activeTuning), [activeTuning]);
   const stringNames = activeTuning.stringNames;
 
@@ -68,31 +66,16 @@ export default function Fretboard() {
     [root, scaleKey, mode, noteClasses],
   );
 
-  const cagedRange = useMemo(() =>
-    (mode === 'caged' && activeCaged)
-      ? getCagedFretRange(root, activeCaged as any)
-      : null,
-    [root, activeCaged, mode],
-  );
-
-  const cagedNotes = useMemo(() =>
-    mode === 'caged' ? getScaleNotes(root, 'Major') : [],
-    [root, mode],
-  );
-
   function isInRange(fret: number): boolean {
     if (mode === 'scales' && activePosition !== null) {
       const pos = positions[activePosition];
       return !!pos && fret >= pos.start && fret <= pos.end;
     }
-    if (mode === 'caged' && cagedRange) {
-      return fret >= cagedRange.start && fret <= cagedRange.end;
-    }
     return true;
   }
 
   function getNoteColor(noteIdx: number, fret: number) {
-    const notes = mode === 'caged' ? cagedNotes : activeNotes;
+    const notes = activeNotes;
     if (!notes.includes(noteIdx)) return null;
     const inRange = isInRange(fret);
     const opacity = inRange ? IN_RANGE_OPACITY : OUT_OF_RANGE_OPACITY;
@@ -132,20 +115,6 @@ export default function Fretboard() {
       if (intv === 10 || intv === 11) return { ...MUSIC_COLORS.extension, opacity, scale, isRoot: false }; // 7th
     }
 
-    if (mode === 'caged' && activeCaged) {
-      const col = CAGED_COLORS[activeCaged];
-      return { fill: col.fill, stroke: col.stroke, text: '#fff', opacity, scale, isRoot: false };
-    }
-
-    if (mode === 'caged' && !activeCaged) {
-      for (const shape of CAGED_ORDER) {
-        const range = getCagedFretRange(root, shape as any);
-        if (fret >= range.start && fret <= range.end) {
-          const col = CAGED_COLORS[shape];
-          return { fill: col.fill, stroke: col.stroke, text: '#fff', opacity: 1, scale: 1, isRoot: false };
-        }
-      }
-    }
 
     return { ...MUSIC_COLORS.scaleTone, opacity, scale, isRoot: false };
   }
@@ -195,26 +164,6 @@ export default function Fretboard() {
           return (
             <Rect x={x1} y={strY(0) - 14} width={x2 - x1} height={(STR_COUNT - 1) * STR_H + 28}
               rx={10} fill="url(#posHL)" />
-          );
-        })()}
-
-        {/* CAGED highlight — same gradient treatment with a caret line */}
-        {mode === 'caged' && cagedRange && activeCaged && (() => {
-          const col = CAGED_COLORS[activeCaged];
-          const x1 = cagedRange.start === 0 ? LEFT_PAD : LEFT_PAD + NUT_W + cagedRange.start * FRET_W - FRET_W / 2;
-          const x2 = LEFT_PAD + NUT_W + (cagedRange.end + 1) * FRET_W - FRET_W / 2;
-          return (
-            <G>
-              <Rect x={x1} y={strY(0) - 14} width={x2 - x1} height={(STR_COUNT - 1) * STR_H + 28}
-                rx={10} fill={col.light} />
-              <Line
-                x1={LEFT_PAD + NUT_W + cagedRange.caretFret * FRET_W - FRET_W / 2}
-                y1={strY(0) - 16}
-                x2={LEFT_PAD + NUT_W + cagedRange.caretFret * FRET_W - FRET_W / 2}
-                y2={strY(LAST_STR) + 16}
-                stroke={col.fill} strokeWidth={1.5} strokeDasharray="5,4" strokeOpacity={0.6}
-              />
-            </G>
           );
         })()}
 

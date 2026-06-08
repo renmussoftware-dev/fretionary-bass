@@ -207,59 +207,6 @@ export const CHORDS: Record<string, ChordDef> = {
   'Maj7♯11':     { intervals:[0,4,7,11,18],        intervalNames:['R','3','5','7','♯11'],         category:'seventh',  description:'Lydian major 7th. Dreamy and floating.' },
 };
 
-export interface CagedShape {
-  name: string;
-  rootString: number; // which string the root sits on (0=high e)
-  description: string;
-  fretSpan: [number, number]; // offset from caret fret [lo, hi]
-  openShape: string; // what open chord it resembles
-}
-
-export const CAGED_SHAPES: Record<string, CagedShape> = {
-  C: { name:'C shape', rootString:1, description:'Root on B string. Upper-neck brightness.', fretSpan:[-2,2], openShape:'C' },
-  A: { name:'A shape', rootString:2, description:'Root on G string. Very common barre shape.', fretSpan:[-1,3], openShape:'A' },
-  G: { name:'G shape', rootString:5, description:'Root on low E. Widest shape, spans 4+ frets.', fretSpan:[-2,3], openShape:'G' },
-  E: { name:'E shape', rootString:5, description:'Root on low E & high e. Most common barre shape.', fretSpan:[0,3], openShape:'E' },
-  D: { name:'D shape', rootString:0, description:'Root on high e. Great for treble lead lines.', fretSpan:[-1,2], openShape:'D' },
-};
-
-export const CAGED_ORDER = ['C','A','G','E','D'] as const;
-export type CagedLetter = typeof CAGED_ORDER[number];
-
-// Per-shape pedagogical tips, surfaced in the Fretboard tab's CAGED detail card.
-export const CAGED_SHAPE_TIPS: Record<CagedLetter, string[]> = {
-  C: [
-    'Root on B string (2nd string)',
-    'Often used in upper fret positions',
-    'Common in country and folk styles',
-    'Connects to A shape above it',
-  ],
-  A: [
-    'Root on G string (3rd string)',
-    'Classic barre chord shape',
-    'Works great for power chord extensions',
-    'Connects to G shape above it',
-  ],
-  G: [
-    'Root on low E string (6th string)',
-    'Widest shape — spans 4+ frets',
-    'Common in open position rock',
-    'Connects to E shape above it',
-  ],
-  E: [
-    'Root on low E AND high e strings',
-    'Most common barre chord shape',
-    'Foundation of rock guitar',
-    'Connects to D shape above it',
-  ],
-  D: [
-    'Root on high e string (1st string)',
-    'Great for melodic lead work',
-    'Often overlooked but very useful',
-    'Connects to C shape above it',
-  ],
-};
-
 // Note colors — Obsidian theme (rebalanced for harmony on dark surfaces).
 // Same identity as before (root yellow / 3rd red / 5th green / ext blue) but
 // lower-chroma so they sit alongside each other instead of competing.
@@ -284,11 +231,3 @@ export const POSITION_COLORS = [
   { fill:'#5C8FCC', light:'rgba(92,143,204,0.16)',  stroke:'#5C8FCC' },
   { fill:'#C19052', light:'rgba(193,144,82,0.16)',  stroke:'#C19052' },
 ];
-
-export const CAGED_COLORS: Record<string, { fill:string; light:string; stroke:string }> = {
-  C: { fill:'#6E60D9', light:'rgba(110,96,217,0.16)', stroke:'#6E60D9' },
-  A: { fill:'#D77144', light:'rgba(215,113,68,0.16)', stroke:'#D77144' },
-  G: { fill:'#3FA08A', light:'rgba(63,160,138,0.16)', stroke:'#3FA08A' },
-  E: { fill:'#5C8FCC', light:'rgba(92,143,204,0.16)', stroke:'#5C8FCC' },
-  D: { fill:'#C19052', light:'rgba(193,144,82,0.16)', stroke:'#C19052' },
-};

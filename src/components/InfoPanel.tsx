@@ -8,7 +8,7 @@ import { getScaleNotes, getChordNotes } from '../utils/theory';
 const INTERVAL_NAMES = ['R','♭2','2','♭3','3','4','♭5','5','♭6','6','♭7','7'];
 
 export default function InfoPanel() {
-  const { root, scaleKey, chordKey, mode, activeCaged, customNotes } = useStore();
+  const { root, scaleKey, chordKey, mode, customNotes } = useStore();
 
   let notes: number[];
   if (mode === 'chords') notes = getChordNotes(root, chordKey);
@@ -36,12 +36,6 @@ export default function InfoPanel() {
     degrees = ch?.description || '—';
     formulaLabel = 'Intervals';
     degreesLabel = 'About';
-  } else if (mode === 'caged') {
-    formula = SCALES['Major']?.formula || '—';
-    degrees = SCALES['Major']?.degrees.join(' ') || '—';
-    description = activeCaged
-      ? `${activeCaged} shape highlighted on the neck`
-      : 'Select a CAGED shape above';
   } else if (mode === 'custom') {
     formula = customNotes.length > 0
       ? customNotes.map(n => INTERVAL_NAMES[(n - root + 12) % 12]).join(' ')

@@ -52,12 +52,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <ToolsIcon color={color} />,
         }}
       />
-
-      {/* Parked for later milestones (port to bass): chords/arpeggios,
-          progression stepper, practice drills. Hidden from the tab bar. */}
-      <Tabs.Screen name="chords" options={{ href: null }} />
-      <Tabs.Screen name="progressions" options={{ href: null }} />
-      <Tabs.Screen name="practice" options={{ href: null }} />
     </Tabs>
   );
 }

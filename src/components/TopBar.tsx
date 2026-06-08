@@ -119,11 +119,9 @@ export default function TopBar() {
 
   const titleSubject = mode === 'chords'
     ? `${NOTES[root]} ${chordKey}`
-    : mode === 'caged'
-      ? `${NOTES[root]} CAGED`
-      : mode === 'custom'
-        ? `${NOTES[root]} Custom`
-        : `${NOTES[root]} ${scaleKey}`;
+    : mode === 'custom'
+      ? `${NOTES[root]} Custom`
+      : `${NOTES[root]} ${scaleKey}`;
 
   return (
     <View style={styles.wrap}>
@@ -133,7 +131,7 @@ export default function TopBar() {
           <Text style={styles.eyebrow}>Fretboard</Text>
           <Text style={styles.title} numberOfLines={1}>{titleSubject}</Text>
         </View>
-        <TuningPicker forcedStandard={mode === 'caged'} />
+        <TuningPicker />
         <TouchableOpacity
           onPress={() => setSavedOpen(true)}
           activeOpacity={0.7}

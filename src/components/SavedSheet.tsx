@@ -17,20 +17,17 @@ type Tab = 'favorites' | 'recents';
 const KIND_LABEL: Record<SavedItem['kind'], string> = {
   scale: 'SCALE',
   chord: 'CHORD',
-  progression: 'PROG',
 };
 
 const KIND_COLOR: Record<SavedItem['kind'], string> = {
   scale: '#378ADD',
   chord: '#1D9E75',
-  progression: '#BA7517',
 };
 
 function itemTitle(it: SavedItem): string {
   const root = NOTES[it.root];
-  if (it.kind === 'scale')       return `${root} ${it.scaleKey}`;
-  if (it.kind === 'chord')       return `${root} ${it.chordKey}`;
-  return `${it.progName} · in ${root}`;
+  if (it.kind === 'scale') return `${root} ${it.scaleKey}`;
+  return `${root} ${it.chordKey}`;
 }
 
 export default function SavedSheet({ visible, onClose }: Props) {
@@ -40,8 +37,8 @@ export default function SavedSheet({ visible, onClose }: Props) {
   const clearRecents = useStore(s => s.clearRecents);
   const setRoot = useStore(s => s.setRoot);
   const setScaleKey = useStore(s => s.setScaleKey);
+  const setChordKey = useStore(s => s.setChordKey);
   const setMode = useStore(s => s.setMode);
-  const setPendingNav = useStore(s => s.setPendingNav);
   const [tab, setTab] = useState<Tab>('favorites');
 
   const items = tab === 'favorites' ? favorites : recents;
@@ -52,14 +49,11 @@ export default function SavedSheet({ visible, onClose }: Props) {
     if (it.kind === 'scale') {
       setScaleKey(it.scaleKey);
       setMode('scales');
-      router.push('/');
-    } else if (it.kind === 'chord') {
-      setPendingNav(it);
-      router.push('/chords');
     } else {
-      setPendingNav(it);
-      router.push('/progressions');
+      setChordKey(it.chordKey);
+      setMode('chords');
     }
+    router.push('/fretboard');
   }
 
   function handleClearRecents() {
@@ -110,14 +104,14 @@ export default function SavedSheet({ visible, onClose }: Props) {
                 </Text>
                 <Text style={styles.emptyDesc}>
                   {tab === 'favorites'
-                    ? 'Tap the heart on any chord, scale, or progression to save it for later.'
-                    : 'Chords, scales, and progressions you select will appear here.'}
+                    ? 'Tap the heart on any chord or scale to save it for later.'
+                    : 'Chords and scales you select will appear here.'}
                 </Text>
               </View>
             ) : (
               items.map(it => (
                 <TouchableOpacity
-                  key={`${it.kind}-${it.root}-${'scaleKey' in it ? it.scaleKey : 'chordKey' in it ? it.chordKey : it.progName}`}
+                  key={`${it.kind}-${it.root}-${'scaleKey' in it ? it.scaleKey : it.chordKey}`}
                   onPress={() => handleTap(it)}
                   activeOpacity={0.7}
                   style={styles.row}

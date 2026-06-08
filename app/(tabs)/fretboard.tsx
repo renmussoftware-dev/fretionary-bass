@@ -8,11 +8,10 @@ import PillSelector from '../../src/components/PillSelector';
 import { COLORS, SPACE, RADIUS, FONT_FAMILY } from '../../src/constants/theme';
 import {
   NOTES, NOTE_DISPLAY,
-  SCALES, CAGED_ORDER, CAGED_COLORS, CAGED_SHAPES,
-  CAGED_SHAPE_TIPS, POSITION_COLORS,
+  SCALES, POSITION_COLORS,
 } from '../../src/constants/music';
 import { useStore } from '../../src/store/useStore';
-import { getScalePositions, getCagedCaretFret } from '../../src/utils/theory';
+import { getScalePositions } from '../../src/utils/theory';
 import { useProGate } from '../../src/hooks/useProGate';
 import { isScaleFree, isChordFree } from '../../src/constants/subscription';
 import { OVERLAY_CHORDS } from '../../src/utils/overlay';
@@ -33,7 +32,6 @@ export default function FretboardScreen() {
     mode, root, scaleKey, setScaleKey,
     chordKey, setChordKey, labelMode, setLabelMode,
     activePosition, setActivePosition,
-    activeCaged, setActiveCaged,
     customNotes, toggleCustomNote, clearCustomNotes,
   } = useStore();
 
@@ -60,15 +58,6 @@ export default function FretboardScreen() {
     })),
   ];
 
-  const cagedOptions = [
-    { label: 'All', value: 'all' },
-    ...CAGED_ORDER.map(shape => ({
-      label: `${shape} shape`,
-      value: shape,
-      dotColor: CAGED_COLORS[shape]?.fill,
-      color: CAGED_COLORS[shape]?.fill,
-    })),
-  ];
 
   const controlsContent = (
     <>
@@ -165,48 +154,6 @@ export default function FretboardScreen() {
                 setActivePosition(v === null || v === 'all' ? null : Number(v));
               }}
               allowDeselect={false} />
-          </View>
-        )}
-        {/* CAGED shape selector + detail card */}
-        {mode === 'caged' && (
-          <View style={styles.section}>
-            <PillSelector label="CAGED shape" options={cagedOptions}
-              value={activeCaged ?? 'all'}
-              onChange={v => {
-                if (v !== null && v !== 'all' && !isPro) { requirePro(() => setActiveCaged(v)); return; }
-                setActiveCaged(v === 'all' ? null : v);
-              }}
-              allowDeselect={false} />
-            {activeCaged && CAGED_SHAPES[activeCaged] && (() => {
-              const shape = CAGED_SHAPES[activeCaged];
-              const col = CAGED_COLORS[activeCaged];
-              const caret = getCagedCaretFret(root, activeCaged as any);
-              const tips = CAGED_SHAPE_TIPS[activeCaged as keyof typeof CAGED_SHAPE_TIPS] ?? [];
-              return (
-                <View style={styles.cagedDetailCard}>
-                  <View style={styles.cagedDetailHeader}>
-                    <View style={[styles.cagedShapeBadge, { backgroundColor: col.fill }]}>
-                      <Text style={styles.cagedShapeBadgeText}>{activeCaged}</Text>
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.cagedShapeTitle}>{shape.name}</Text>
-                      <Text style={styles.cagedShapeSub}>Caret fret · {caret || 'open'}</Text>
-                    </View>
-                  </View>
-                  <Text style={styles.cagedShapeDesc}>{shape.description}</Text>
-                  <View style={styles.cagedTipsList}>
-                    {tips.map((tip, i) => (
-                      <View key={i} style={styles.cagedTipRow}>
-                        <View style={styles.cagedTipNumber}>
-                          <Text style={styles.cagedTipNumberText}>{i + 1}</Text>
-                        </View>
-                        <Text style={styles.cagedTipText}>{tip}</Text>
-                      </View>
-                    ))}
-                  </View>
-                </View>
-              );
-            })()}
           </View>
         )}
         <View style={styles.section}>
@@ -338,47 +285,4 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     fontWeight: '600',
   },
-  // CAGED detail card (replaces the legacy cagedInfo block).
-  cagedDetailCard: {
-    marginTop: SPACE.md,
-    marginHorizontal: SPACE.lg,
-    padding: SPACE.lg,
-    borderRadius: RADIUS.lg,
-    backgroundColor: COLORS.surface,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  cagedDetailHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: SPACE.sm,
-  },
-  cagedShapeBadge: {
-    width: 40, height: 40,
-    borderRadius: RADIUS.md,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  cagedShapeBadgeText: {
-    fontSize: 16, fontWeight: '700',
-    color: '#fff',
-    fontFamily: FONT_FAMILY.mono,
-  },
-  cagedShapeTitle: { fontSize: 16, fontWeight: '700', color: COLORS.text },
-  cagedShapeSub:   { fontSize: 12, color: COLORS.textMuted, marginTop: 2 },
-  cagedShapeDesc:  { fontSize: 13, color: COLORS.textMuted, lineHeight: 19, marginBottom: SPACE.md },
-  cagedTipsList:   { gap: 10 },
-  cagedTipRow:     { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
-  cagedTipNumber:  {
-    width: 18, height: 18, borderRadius: 9,
-    backgroundColor: COLORS.accentSoft,
-    alignItems: 'center', justifyContent: 'center',
-    marginTop: 1,
-  },
-  cagedTipNumberText: {
-    fontSize: 10, fontWeight: '700',
-    color: COLORS.accent,
-    fontFamily: FONT_FAMILY.mono,
-  },
-  cagedTipText:    { flex: 1, fontSize: 13, color: COLORS.text, lineHeight: 19 },
 });

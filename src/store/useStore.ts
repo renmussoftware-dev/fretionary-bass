@@ -17,13 +17,12 @@ const REVIEW_MIN_DAYS_SINCE_LAST = 60;
  */
 export const PAYWALL_PROMPT_MIN_ACTIONS = 3;
 
-export type AppMode = 'scales' | 'chords' | 'caged' | 'custom';
+export type AppMode = 'scales' | 'chords' | 'custom';
 export type LabelMode = 'name' | 'degree' | 'interval' | 'none';
 
 export type SavedItem =
-  | { kind: 'scale';       root: number; scaleKey: string;     addedAt: number }
-  | { kind: 'chord';       root: number; chordKey: string;     addedAt: number }
-  | { kind: 'progression'; root: number; progName: string;     addedAt: number };
+  | { kind: 'scale'; root: number; scaleKey: string; addedAt: number }
+  | { kind: 'chord'; root: number; chordKey: string; addedAt: number };
 
 // Distributive Omit so the discriminated union survives the omission of `addedAt`.
 type DistributiveOmit<T, K extends keyof any> = T extends any ? Omit<T, K> : never;
@@ -33,9 +32,8 @@ const RECENTS_MAX = 20;
 
 function itemKey(it: SavedItemInput): string {
   switch (it.kind) {
-    case 'scale':       return `s:${it.root}:${it.scaleKey}`;
-    case 'chord':       return `c:${it.root}:${it.chordKey}`;
-    case 'progression': return `p:${it.root}:${it.progName}`;
+    case 'scale': return `s:${it.root}:${it.scaleKey}`;
+    case 'chord': return `c:${it.root}:${it.chordKey}`;
   }
 }
 
@@ -46,7 +44,6 @@ interface AppState {
   mode: AppMode;
   labelMode: LabelMode;
   activePosition: number | null;
-  activeCaged: string | null;
   showAllFrets: boolean;
   isPro: boolean;
   tuningId: string;
@@ -77,18 +74,12 @@ interface AppState {
   paywallPromptShownAt: number | null;
   markPaywallPromptShown: () => void;
 
-  // Transient: set by the Saved sheet so a tab screen can apply its local
-  // selection on next render. The screen clears it after consuming.
-  pendingNav: SavedItem | null;
-  setPendingNav: (item: SavedItem | null) => void;
-
   setRoot: (r: number) => void;
   setScaleKey: (k: string) => void;
   setChordKey: (k: string) => void;
   setMode: (m: AppMode) => void;
   setLabelMode: (l: LabelMode) => void;
   setActivePosition: (p: number | null) => void;
-  setActiveCaged: (c: string | null) => void;
   setShowAllFrets: (v: boolean) => void;
   setIsPro: (v: boolean) => void;
   setTuningId: (id: string) => void;
@@ -113,7 +104,6 @@ export const useStore = create<AppState>()(
       // references expect (spec §8).
       labelMode: 'interval',
       activePosition: null,
-      activeCaged: null,
       showAllFrets: false,
       isPro: false,
       tuningId: 'standard',
@@ -130,9 +120,6 @@ export const useStore = create<AppState>()(
       positiveActionCount: 0,
       lastPromptedAt: null,
       paywallPromptShownAt: null,
-      pendingNav: null,
-
-      setPendingNav: (pendingNav) => set({ pendingNav }),
 
       markPaywallPromptShown: () => set({ paywallPromptShownAt: Date.now() }),
 
@@ -167,10 +154,9 @@ export const useStore = create<AppState>()(
       setRoot: (root) => set({ root }),
       setScaleKey: (scaleKey) => set({ scaleKey, activePosition: null }),
       setChordKey: (chordKey) => set({ chordKey }),
-      setMode: (mode) => set({ mode, activePosition: null, activeCaged: null }),
+      setMode: (mode) => set({ mode, activePosition: null }),
       setLabelMode: (labelMode) => set({ labelMode }),
       setActivePosition: (activePosition) => set({ activePosition }),
-      setActiveCaged: (activeCaged) => set({ activeCaged }),
       setShowAllFrets: (showAllFrets) => set({ showAllFrets }),
       setIsPro: (isPro) => set({ isPro }),
       setTuningId: (tuningId) => set({ tuningId }),

@@ -71,14 +71,6 @@ export const COLORS = {
     stroke: fill,
   })),
 
-  caged: {
-    C: { fill: POS_FILLS[0], light: mix(POS_FILLS[0], 0.16), stroke: POS_FILLS[0] },
-    A: { fill: POS_FILLS[1], light: mix(POS_FILLS[1], 0.16), stroke: POS_FILLS[1] },
-    G: { fill: POS_FILLS[2], light: mix(POS_FILLS[2], 0.16), stroke: POS_FILLS[2] },
-    E: { fill: POS_FILLS[3], light: mix(POS_FILLS[3], 0.16), stroke: POS_FILLS[3] },
-    D: { fill: POS_FILLS[4], light: mix(POS_FILLS[4], 0.16), stroke: POS_FILLS[4] },
-  } as Record<string, { fill: string; light: string; stroke: string }>,
-
   accent:      '#6E60D9',                 // brand indigo, slightly desaturated
   accentSoft:  'rgba(110,96,217,0.18)',
   accentGlow:  'rgba(110,96,217,0.35)',

@@ -69,7 +69,7 @@ export default function Paywall({ onClose, onSuccess }: Props) {
     setPurchasing(false);
     if (success) {
       Alert.alert(
-        'Welcome to Fretionary Pro! 🎸',
+        'Welcome to Fretionary Bass Pro! 🎸',
         'You now have full access to all features.',
         [{ text: 'Let\'s go!', onPress: () => {
           onSuccess?.();
@@ -110,10 +110,10 @@ export default function Paywall({ onClose, onSuccess }: Props) {
     switch (pkg.packageType) {
       case PACKAGE_TYPE.MONTHLY:
         return [
-          'All 14 scales & modes',
-          'Full chord library (36 types)',
-          'All progressions',
-          'Real guitar audio',
+          'All scales & modes',
+          'All chords, incl. 7ths',
+          'All tunings (4 / 5 / 6-string)',
+          'Custom mode & real bass audio',
           'Cancel anytime',
         ];
       case PACKAGE_TYPE.LIFETIME:
@@ -145,7 +145,7 @@ export default function Paywall({ onClose, onSuccess }: Props) {
         <View style={styles.proWrap}>
           <Text style={styles.proEmoji}>🎸</Text>
           <Text style={styles.proTitle}>You're on Pro!</Text>
-          <Text style={styles.proSub}>Full access to all Fretionary features.</Text>
+          <Text style={styles.proSub}>Full access to all Fretionary Bass features.</Text>
           {onClose && (
             <TouchableOpacity style={styles.closeBtnPro} onPress={onClose}>
               <Text style={styles.closeBtnProText}>Continue</Text>
@@ -166,7 +166,7 @@ export default function Paywall({ onClose, onSuccess }: Props) {
           </TouchableOpacity>
         )}
         <Text style={styles.headline}>Unlock the full neck.</Text>
-        <Text style={styles.subheadline}>All scales. All chords. Real guitar audio.</Text>
+        <Text style={styles.subheadline}>All scales. All chords. All tunings. Real bass audio.</Text>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
@@ -250,8 +250,8 @@ export default function Paywall({ onClose, onSuccess }: Props) {
 
         <Text style={styles.legal}>
           {Platform.OS === 'ios'
-            ? 'Fretionary Pro — Monthly auto-renewable subscription or one-time Lifetime purchase. Payment will be charged to your Apple ID at confirmation of purchase. Monthly subscriptions automatically renew unless auto-renew is turned off at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period. Manage or cancel subscriptions in your App Store account settings after purchase.'
-            : 'Fretionary Pro — Monthly auto-renewing subscription or one-time Lifetime purchase. Payment will be charged to your Google account at confirmation of purchase. Monthly subscriptions automatically renew unless cancelled at least 24 hours before the end of the current period. Manage or cancel subscriptions in the Google Play Store under Subscriptions after purchase.'}
+            ? 'Fretionary Bass Pro — Monthly auto-renewable subscription or one-time Lifetime purchase. Payment will be charged to your Apple ID at confirmation of purchase. Monthly subscriptions automatically renew unless auto-renew is turned off at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period. Manage or cancel subscriptions in your App Store account settings after purchase.'
+            : 'Fretionary Bass Pro — Monthly auto-renewing subscription or one-time Lifetime purchase. Payment will be charged to your Google account at confirmation of purchase. Monthly subscriptions automatically renew unless cancelled at least 24 hours before the end of the current period. Manage or cancel subscriptions in the Google Play Store under Subscriptions after purchase.'}
         </Text>
 
         <View style={styles.legalLinks}>
