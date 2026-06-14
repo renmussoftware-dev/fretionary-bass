@@ -134,7 +134,7 @@ export default function TopBar() {
         </View>
         {currentStreak > 0 && (
           <View style={styles.streakChip}>
-            <Text style={styles.streakText}>🔥 {currentStreak}</Text>
+            <Text style={styles.streakText}>🔥 {currentStreak} day streak!</Text>
           </View>
         )}
         <TuningPicker />
