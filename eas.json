@@ -34,7 +34,6 @@
     "production": {
       "ios": {
         "appleId": "renmussoftware@gmail.com",
-        "ascAppId": "PLACEHOLDER_ASC_APP_ID",
         "appleTeamId": "KHWB32323Q"
       },
       "android": {
