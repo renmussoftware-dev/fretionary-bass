@@ -17,6 +17,26 @@ const REVIEW_MIN_DAYS_SINCE_LAST = 60;
  */
 export const PAYWALL_PROMPT_MIN_ACTIONS = 3;
 
+// ── Streak helpers ──────────────────────────────────────────────────────────
+// Date keys are local-time YYYY-MM-DD strings so day boundaries match the
+// user's wall clock (a New Yorker and a Tokyoite both get credit at their
+// own midnight, not UTC's). Compare strings == strings — no timezone math
+// once you're in the YYYY-MM-DD format.
+
+function dateKey(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function todayKey(): string {
+  return dateKey(new Date());
+}
+
+function yesterdayKey(): string {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return dateKey(d);
+}
+
 export type AppMode = 'scales' | 'chords' | 'custom';
 export type LabelMode = 'name' | 'degree' | 'interval' | 'none';
 
@@ -74,6 +94,15 @@ interface AppState {
   paywallPromptShownAt: number | null;
   markPaywallPromptShown: () => void;
 
+  // Streak state — counts consecutive days of app activity. lastActivityDate
+  // is a local-time YYYY-MM-DD string so we compare days, not timestamps
+  // (a 7am open followed by an 11pm open on the same day is still one day).
+  // Driven by recordActivity(), called from app/_layout.tsx on app launch.
+  lastActivityDate: string | null;
+  currentStreak: number;
+  longestStreak: number;
+  recordActivity: () => void;
+
   setRoot: (r: number) => void;
   setScaleKey: (k: string) => void;
   setChordKey: (k: string) => void;
@@ -120,8 +149,27 @@ export const useStore = create<AppState>()(
       positiveActionCount: 0,
       lastPromptedAt: null,
       paywallPromptShownAt: null,
+      lastActivityDate: null,
+      currentStreak: 0,
+      longestStreak: 0,
 
       markPaywallPromptShown: () => set({ paywallPromptShownAt: Date.now() }),
+
+      recordActivity: () => {
+        const today = todayKey();
+        const state = get();
+        if (state.lastActivityDate === today) return; // already counted today
+        // Carry the streak forward if yesterday was active; otherwise reset to 1.
+        const newStreak = state.lastActivityDate === yesterdayKey()
+          ? state.currentStreak + 1
+          : 1;
+        const newLongest = Math.max(state.longestStreak, newStreak);
+        set({
+          lastActivityDate: today,
+          currentStreak: newStreak,
+          longestStreak: newLongest,
+        });
+      },
 
       recordPositiveAction: () => {
         const now = Date.now();
@@ -212,6 +260,9 @@ export const useStore = create<AppState>()(
         positiveActionCount: s.positiveActionCount,
         lastPromptedAt: s.lastPromptedAt,
         paywallPromptShownAt: s.paywallPromptShownAt,
+        lastActivityDate: s.lastActivityDate,
+        currentStreak: s.currentStreak,
+        longestStreak: s.longestStreak,
       }),
     },
   ),

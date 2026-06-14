@@ -46,6 +46,7 @@ export default function OverlayScreen() {
     overlayUnderlay, setOverlayUnderlay,
     overlayFret, setOverlayFret,
   } = useStore();
+  const currentStreak = useStore(s => s.currentStreak);
 
   const chord = CHORDS[chordKey];
   const activeChord = OVERLAY_CHORDS.find(c => c.key === chordKey);
@@ -72,6 +73,11 @@ export default function OverlayScreen() {
             {NOTES[root]}{activeChord ? ` ${activeChord.symbol}` : ''}
           </Text>
         </View>
+        {currentStreak > 0 && (
+          <View style={styles.streakChip}>
+            <Text style={styles.streakText}>🔥 {currentStreak}</Text>
+          </View>
+        )}
         <TuningPicker />
       </View>
 
@@ -224,6 +230,15 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20, fontWeight: '700',
     color: COLORS.text, letterSpacing: -0.2,
+  },
+  streakChip: {
+    paddingHorizontal: 9, paddingVertical: 4,
+    borderRadius: RADIUS.full,
+    backgroundColor: 'rgba(232,212,77,0.12)',
+    borderWidth: 1, borderColor: 'rgba(232,212,77,0.35)',
+  },
+  streakText: {
+    fontSize: 12, fontWeight: '700', color: '#E8D44D', letterSpacing: 0.2,
   },
   // flexGrow:0 keeps this horizontal scroller from expanding to fill the
   // column's spare vertical space (which would stretch the pills tall).
