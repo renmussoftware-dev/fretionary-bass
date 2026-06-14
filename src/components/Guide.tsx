@@ -22,7 +22,7 @@ const SECTIONS: Section[] = [
   {
     title: 'Chord-Tone Overlay',
     intro: 'The hero view — for playing over changes. Pick a root and chord and the strong notes — root, 3rd, 5th, 7th — light up across the neck, with the matching scale dimmed underneath as backup. Lock it to your hand position and tap any note to hear it.',
-    navTo: '/',
+    navTo: '/overlay',
     navLabel: 'Open Overlay',
     features: [
       { name: 'Chord tones, color-coded', desc: 'Root, 3rd, 5th and 7th in distinct colors so the notes that lock with the chord pop.', badge: 'free' },
@@ -35,7 +35,7 @@ const SECTIONS: Section[] = [
   {
     title: 'Fretboard',
     intro: 'The plain reference neck. Where the Overlay answers “what do I play over this chord,” the Fretboard just maps a whole scale, a chord’s arpeggio, or your own notes across the neck — no scale underlay, no position lock. Color-coded by interval.',
-    navTo: '/fretboard',
+    navTo: '/',
     navLabel: 'Open Fretboard',
     features: [
       { name: 'Scales mode', desc: 'A full scale or mode mapped across the neck, with auto-detected position boxes. Major, the modes, pentatonics, blues, harmonic/melodic minor.', badge: 'mixed' },

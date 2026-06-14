@@ -30,19 +30,19 @@ export default function TabLayout() {
         },
       }}
     >
-      {/* HERO — chord-tone overlay, the default landing screen */}
+      {/* Fretboard is the default landing screen (index) */}
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Overlay',
-          tabBarIcon: ({ color }) => <OverlayIcon color={color} />,
+          title: 'Fretboard',
+          tabBarIcon: ({ color }) => <FretboardIcon color={color} />,
         }}
       />
       <Tabs.Screen
-        name="fretboard"
+        name="overlay"
         options={{
-          title: 'Fretboard',
-          tabBarIcon: ({ color }) => <FretboardIcon color={color} />,
+          title: 'Overlay',
+          tabBarIcon: ({ color }) => <OverlayIcon color={color} />,
         }}
       />
       <Tabs.Screen

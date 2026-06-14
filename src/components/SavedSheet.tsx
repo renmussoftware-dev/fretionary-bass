@@ -53,7 +53,7 @@ export default function SavedSheet({ visible, onClose }: Props) {
       setChordKey(it.chordKey);
       setMode('chords');
     }
-    router.push('/fretboard');
+    router.push('/');
   }
 
   function handleClearRecents() {
