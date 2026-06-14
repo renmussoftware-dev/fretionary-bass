@@ -3,7 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fretionary — Guitar Theory, Everywhere on the Neck</title>
+<title>Fretionary Bass — See What to Play Over Any Chord</title>
+<meta name="description" content="A fast, visual chord-tone overlay for bass. Pick a chord and the root, 3rd, 5th and 7th light up across the neck — on your bass, in your tuning. 4, 5 and 6-string.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Fretionary Bass — See What to Play Over Any Chord">
+<meta property="og:description" content="The chord-tone overlay for bass. The strong notes, lit up right where your hand is.">
+<!-- TODO: set og:url and og:image once the domain is live -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -70,6 +75,15 @@
   }
 
   .nav-logo span { color: var(--gold); }
+  .nav-logo small {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-left: 8px;
+    vertical-align: middle;
+  }
 
   .nav-links {
     display: flex;
@@ -112,12 +126,7 @@
     padding: 120px 48px 80px;
   }
 
-  /* Animated fretboard background */
-  .hero-bg {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-  }
+  .hero-bg { position: absolute; inset: 0; overflow: hidden; }
 
   .fret-lines {
     position: absolute;
@@ -137,10 +146,7 @@
     animation-delay: var(--delay);
   }
 
-  @keyframes fretPulse {
-    0%, 100% { opacity: 0.4; }
-    50% { opacity: 1; }
-  }
+  @keyframes fretPulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
 
   .string-lines {
     position: absolute;
@@ -159,7 +165,6 @@
     transform: translateY(var(--y));
   }
 
-  /* Floating note dots */
   .note-dot {
     position: absolute;
     border-radius: 50%;
@@ -180,12 +185,7 @@
     100% { opacity: 0; transform: translateY(-10px) scale(0.8); }
   }
 
-  .hero-content {
-    position: relative;
-    z-index: 10;
-    text-align: center;
-    max-width: 780px;
-  }
+  .hero-content { position: relative; z-index: 10; text-align: center; max-width: 800px; }
 
   .hero-badge {
     display: inline-flex;
@@ -214,23 +214,20 @@
 
   h1 {
     font-family: 'DM Serif Display', serif;
-    font-size: clamp(52px, 7vw, 88px);
+    font-size: clamp(50px, 7vw, 86px);
     line-height: 1.0;
     letter-spacing: -2px;
     color: var(--text);
     margin-bottom: 24px;
   }
 
-  h1 em {
-    font-style: italic;
-    color: var(--gold);
-  }
+  h1 em { font-style: italic; color: var(--gold); }
 
   .hero-sub {
     font-size: 18px;
     color: var(--muted);
     line-height: 1.65;
-    max-width: 520px;
+    max-width: 560px;
     margin: 0 auto 44px;
     font-weight: 400;
   }
@@ -277,10 +274,7 @@
   .btn-secondary:hover { color: var(--text); }
 
   /* ── FRETBOARD DEMO ── */
-  .fretboard-section {
-    padding: 80px 48px;
-    position: relative;
-  }
+  .fretboard-section { padding: 80px 48px; position: relative; }
 
   .section-label {
     font-family: 'DM Mono', monospace;
@@ -309,16 +303,9 @@
     justify-content: space-between;
   }
 
-  .fretboard-title {
-    font-size: 13px;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-  }
+  .fretboard-title { font-size: 13px; color: var(--muted); font-family: 'DM Mono', monospace; }
 
-  .mode-pills {
-    display: flex;
-    gap: 6px;
-  }
+  .mode-pills { display: flex; gap: 6px; }
 
   .mode-pill {
     padding: 4px 10px;
@@ -335,21 +322,27 @@
     color: var(--gold);
   }
 
-  /* SVG Fretboard */
-  .fretboard-svg-wrap {
-    padding: 32px 24px;
+  .fretboard-svg-wrap { padding: 32px 24px; background: #0d0d10; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    padding: 0 24px 24px;
     background: #0d0d10;
+  }
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); }
+  .legend-dot {
+    width: 16px; height: 16px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8px; font-weight: 700; font-family: 'DM Mono', monospace;
   }
 
   /* ── FEATURES GRID ── */
-  .features-section {
-    padding: 80px 48px;
-  }
+  .features-section { padding: 80px 48px; }
 
-  .features-header {
-    max-width: 560px;
-    margin-bottom: 60px;
-  }
+  .features-header { max-width: 560px; margin-bottom: 60px; }
 
   h2 {
     font-family: 'DM Serif Display', serif;
@@ -411,172 +404,82 @@
     letter-spacing: -0.3px;
   }
 
-  .feature-card p {
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.65;
-  }
+  .feature-card p { font-size: 13px; color: var(--muted); line-height: 1.65; }
 
-  /* ── CHORD DIAGRAM SHOWCASE ── */
-  .chord-section {
-    padding: 80px 48px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .chord-row {
-    display: flex;
-    gap: 16px;
-    margin-top: 48px;
-    overflow-x: auto;
-    padding-bottom: 8px;
-    scrollbar-width: none;
-  }
-
-  .chord-row::-webkit-scrollbar { display: none; }
-
-  .chord-card {
-    flex-shrink: 0;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 24px 20px;
-    width: 160px;
-    text-align: center;
-    transition: all 0.2s;
-    cursor: default;
-  }
-
-  .chord-card:hover {
-    border-color: rgba(232,200,77,0.3);
-    transform: translateY(-3px);
-    box-shadow: 0 16px 48px rgba(0,0,0,0.4);
-  }
-
-  .chord-name {
-    font-family: 'DM Serif Display', serif;
-    font-size: 15px;
-    margin-bottom: 4px;
-  }
-
-  .chord-type {
-    font-size: 11px;
-    color: var(--muted);
-    margin-bottom: 16px;
-    font-family: 'DM Mono', monospace;
-  }
-
-  /* Mini chord box */
-  .mini-chord {
-    width: 100%;
-    aspect-ratio: 0.75;
-  }
-
-  /* ── CAGED SECTION ── */
-  .caged-section {
+  /* ── TUNINGS SECTION ── */
+  .tunings-section {
     padding: 80px 48px;
     background: var(--surface);
     border-top: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
   }
 
-  .caged-inner {
+  .tunings-inner {
     max-width: 1100px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1.1fr;
     gap: 80px;
     align-items: center;
   }
 
-  .caged-shapes {
-    display: flex;
-    gap: 10px;
+  .tuning-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
   }
 
-  .caged-shape {
-    flex: 1;
-    aspect-ratio: 0.6;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'DM Serif Display', serif;
-    font-size: 24px;
-    border: 1px solid;
-    transition: all 0.3s;
-    cursor: default;
+  .tuning-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 18px;
+    transition: all 0.25s;
   }
 
-  .caged-shape:hover { transform: translateY(-4px) scale(1.03); }
+  .tuning-card:hover { transform: translateY(-3px); border-color: rgba(232,200,77,0.3); }
 
-  /* ── PROGRESSIONS ── */
-  .progressions-section {
-    padding: 80px 48px;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-
-  .prog-list {
-    margin-top: 48px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .prog-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px;
-    background: var(--surface);
-    border-radius: 10px;
-    transition: background 0.2s;
-    cursor: default;
-  }
-
-  .prog-item:hover { background: var(--surface2); }
-
-  .prog-item-left {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-
-  .prog-genre {
-    font-size: 10px;
+  .tuning-card .t-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .tuning-card .t-notes {
     font-family: 'DM Mono', monospace;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--muted);
-    width: 60px;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+  .tuning-card .t-meta { font-size: 11px; color: var(--muted); }
+  .tuning-card .t-free { color: var(--green); font-weight: 700; }
+
+  /* ── HOW IT WORKS ── */
+  .how-section { padding: 80px 48px; max-width: 1100px; margin: 0 auto; }
+
+  .steps {
+    margin-top: 56px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
   }
 
-  .prog-name {
-    font-size: 14px;
-    font-weight: 500;
+  .step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px 28px;
   }
 
-  .prog-numerals {
-    display: flex;
-    gap: 6px;
-  }
-
-  .prog-num {
+  .step-num {
     font-family: 'DM Mono', monospace;
     font-size: 12px;
-    padding: 3px 8px;
-    border-radius: 6px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--muted);
+    color: var(--gold);
+    letter-spacing: 1px;
+    margin-bottom: 16px;
   }
 
+  .step h3 { font-family: 'DM Serif Display', serif; font-size: 19px; margin-bottom: 8px; letter-spacing: -0.3px; }
+  .step p { font-size: 13px; color: var(--muted); line-height: 1.65; }
+
   /* ── PRICING ── */
-  .pricing-section {
-    padding: 80px 48px;
-    text-align: center;
-  }
+  .pricing-section { padding: 80px 48px; text-align: center; }
 
   .pricing-cards {
     display: flex;
@@ -591,7 +494,7 @@
     border: 1px solid var(--border);
     border-radius: 20px;
     padding: 40px 36px;
-    width: 280px;
+    width: 290px;
     text-align: left;
     position: relative;
     transition: all 0.2s;
@@ -635,11 +538,7 @@
     letter-spacing: -1px;
   }
 
-  .pricing-per {
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 28px;
-  }
+  .pricing-per { font-size: 12px; color: var(--muted); margin-bottom: 28px; }
 
   .pricing-features {
     list-style: none;
@@ -695,30 +594,13 @@
     justify-content: space-between;
   }
 
-  .footer-logo {
-    font-family: 'DM Serif Display', serif;
-    font-size: 18px;
-    color: var(--muted);
-  }
-
+  .footer-logo { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--muted); }
   .footer-logo span { color: var(--gold); }
-
-  .footer-copy {
-    font-size: 12px;
-    color: var(--faint);
-  }
+  .footer-copy { font-size: 12px; color: var(--faint); }
 
   /* ── SCROLL ANIMATIONS ── */
-  .reveal {
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
-  }
-
-  .reveal.visible {
-    opacity: 1;
-    transform: none;
-  }
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
 
   /* ── HAMBURGER ── */
   .nav-hamburger {
@@ -760,10 +642,7 @@
     pointer-events: none;
     transition: opacity 0.25s;
   }
-  .mobile-menu.open {
-    opacity: 1;
-    pointer-events: all;
-  }
+  .mobile-menu.open { opacity: 1; pointer-events: all; }
   .mobile-menu a {
     font-family: 'DM Serif Display', serif;
     font-size: 32px;
@@ -794,9 +673,10 @@
     .nav-hamburger { display: flex; }
     .mobile-menu { display: flex; }
     .hero { padding: 100px 24px 60px; }
-    .features-section, .chord-section, .caged-section, .progressions-section, .pricing-section, .fretboard-section { padding: 60px 24px; }
+    .features-section, .tunings-section, .how-section, .pricing-section, .fretboard-section { padding: 60px 24px; }
     .features-grid { grid-template-columns: 1fr; }
-    .caged-inner { grid-template-columns: 1fr; gap: 40px; }
+    .tunings-inner { grid-template-columns: 1fr; gap: 40px; }
+    .steps { grid-template-columns: 1fr; }
     footer { flex-direction: column; gap: 16px; text-align: center; padding: 32px 24px; }
   }
 </style>
@@ -805,16 +685,15 @@
 
 <!-- NAV -->
 <nav>
-  <a href="#" class="nav-logo">Fretionary<span>.</span></a>
+  <a href="#" class="nav-logo">Fretionary<span>.</span><small>Bass</small></a>
   <ul class="nav-links">
+    <li><a href="#overlay">Overlay</a></li>
     <li><a href="#features">Features</a></li>
-    <li><a href="#whats-new">What's new</a></li>
-    <li><a href="#chords">Chords</a></li>
-    <li><a href="#caged">CAGED</a></li>
-    <li><a href="#progressions">Progressions</a></li>
+    <li><a href="#tunings">Tunings</a></li>
     <li><a href="#pricing">Pricing</a></li>
   </ul>
-  <a href="/download" class="nav-cta">Download Free</a>
+  <!-- TODO: point at the real store listing once the app is live -->
+  <a href="#pricing" class="nav-cta">Get the App</a>
   <button class="nav-hamburger" id="hamburger" aria-label="Open menu">
     <span></span><span></span><span></span>
   </button>
@@ -822,446 +701,193 @@
 
 <!-- MOBILE MENU -->
 <div class="mobile-menu" id="mobileMenu">
+  <a href="#overlay" class="mobile-link">Overlay</a>
   <a href="#features" class="mobile-link">Features</a>
-  <a href="#whats-new" class="mobile-link">What's new</a>
-  <a href="#chords" class="mobile-link">Chords</a>
-  <a href="#caged" class="mobile-link">CAGED</a>
-  <a href="#progressions" class="mobile-link">Progressions</a>
+  <a href="#tunings" class="mobile-link">Tunings</a>
   <a href="#pricing" class="mobile-link">Pricing</a>
-  <a href="/download" class="mobile-cta mobile-link">Download Free</a>
+  <a href="#pricing" class="mobile-cta mobile-link">Get the App</a>
 </div>
 
 <!-- HERO -->
 <section class="hero">
   <div class="hero-bg">
-    <!-- Fret lines -->
     <div class="fret-lines" id="fretLines"></div>
-    <!-- String lines -->
     <div class="string-lines" id="stringLines"></div>
-    <!-- Floating note dots -->
     <div id="noteDots"></div>
   </div>
 
   <div class="hero-content">
     <div class="hero-badge">
       <div class="hero-badge-dot"></div>
-      Guitar Theory App
+      Bass Theory App · Coming Soon
     </div>
-    <h1>Every note on<br>the neck has<br><em>a name.</em></h1>
+    <h1>See what to play<br>over <em>any chord.</em></h1>
     <p class="hero-sub">
-      The most visual, interactive guitar theory companion. Scales, chords, CAGED, real progressions, alternate tunings, and built-in practice drills — all connected, all in one place.
+      The strong notes — root, 3rd, 5th, 7th — lit up right where your hand is. On your bass, in your tuning. Stop guessing the changes and start locking in.
     </p>
     <div class="hero-actions">
-      <a href="https://apps.apple.com/us/app/fretionary/id6761344883" class="btn-primary" target="_blank" rel="noopener">
+      <!-- TODO: replace href with the real App Store / Google Play URLs at launch -->
+      <a href="#pricing" class="btn-primary">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
         App Store
       </a>
-      <a href="https://play.google.com/store/apps/details?id=com.renmussoftware.nodi" class="btn-primary" target="_blank" rel="noopener">
+      <a href="#pricing" class="btn-primary">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 0 1 0 1.73l-2.808 1.626L15.39 12l2.308-2.491zM5.864 2.658L16.802 8.99l-2.302 2.302-8.636-8.634z"/></svg>
         Google Play
       </a>
-      <a href="#features" class="btn-secondary">
-        See all features →
-      </a>
+      <a href="#overlay" class="btn-secondary">See it in action →</a>
     </div>
   </div>
 </section>
 
-<!-- INTERACTIVE FRETBOARD DEMO -->
-<section class="fretboard-section reveal" id="features">
+<!-- OVERLAY DEMO -->
+<section class="fretboard-section reveal" id="overlay">
   <div style="max-width:900px;margin:0 auto">
-    <span class="section-label">Interactive Fretboard</span>
-    <h2 style="margin-bottom:32px">See the whole<br>neck at once</h2>
+    <span class="section-label">Chord-Tone Overlay</span>
+    <h2 style="margin-bottom:32px">The whole neck,<br>locked to the chord</h2>
   </div>
   <div class="fretboard-demo reveal">
     <div class="fretboard-header">
-      <span class="fretboard-title">A Minor Pentatonic — Position 1</span>
+      <span class="fretboard-title">E Minor 7 — overlay over E Dorian</span>
       <div class="mode-pills">
-        <span class="mode-pill active">Scales</span>
-        <span class="mode-pill">Chords</span>
-        <span class="mode-pill">CAGED</span>
+        <span class="mode-pill active">Overlay</span>
+        <span class="mode-pill">Scales</span>
+        <span class="mode-pill">Arpeggio</span>
       </div>
     </div>
     <div class="fretboard-svg-wrap">
-      <svg id="mainFretboard" width="100%" height="200" viewBox="0 0 860 200" xmlns="http://www.w3.org/2000/svg"></svg>
+      <svg id="mainFretboard" width="100%" height="180" viewBox="0 0 860 180" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><span class="legend-dot" style="background:#e8c84d;color:#5C4400">R</span> Root</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#e24b4a;color:#fff">3</span> 3rd</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#1d9e75;color:#fff">5</span> 5th</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#378add;color:#fff">7</span> 7th</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#3a3a46;color:#ccc"></span> Scale</div>
     </div>
   </div>
 </section>
 
 <!-- FEATURES GRID -->
-<section class="features-section">
+<section class="features-section" id="features">
   <div class="features-header reveal">
     <span class="section-label">Everything you need</span>
-    <h2>Built for guitarists<br>of every level</h2>
+    <h2>Built for the<br>way bassists play</h2>
   </div>
   <div class="features-grid reveal">
     <div class="feature-card" style="--accent-color:var(--gold);--icon-bg:rgba(232,200,77,0.08);--icon-border:rgba(232,200,77,0.2)">
-      <div class="feature-icon">🎸</div>
-      <h3>14 Scales & Modes</h3>
-      <p>Major, minor, all 7 modes, pentatonic, blues, whole tone, and diminished. Every scale shows its formula, degrees, and up to 5 position boxes.</p>
-    </div>
-    <div class="feature-card" style="--accent-color:var(--red);--icon-bg:rgba(226,75,74,0.08);--icon-border:rgba(226,75,74,0.2)">
-      <div class="feature-icon">🎵</div>
-      <h3>36 Chord Types</h3>
-      <p>From basic triads to altered dominants and 13th jazz chords. Every chord shows curated, physically playable fingering diagrams across open, mid, and high neck positions.</p>
+      <div class="feature-icon">🎯</div>
+      <h3>Chord-Tone Overlay</h3>
+      <p>Pick a root and chord and the root, 3rd, 5th and 7th light up across the neck — color-coded so the notes that lock with the chord pop. The matching scale sits dimmed underneath.</p>
     </div>
     <div class="feature-card" style="--accent-color:var(--blue);--icon-bg:rgba(55,138,221,0.08);--icon-border:rgba(55,138,221,0.2)">
-      <div class="feature-icon">🔷</div>
-      <h3>CAGED System</h3>
-      <p>A full guide to all 5 shapes with interactive fretboard overlays. See exactly where each shape sits for your key and how they connect across the neck.</p>
+      <div class="feature-icon">🎸</div>
+      <h3>4, 5 &amp; 6-String</h3>
+      <p>String count is built in. Standard, Drop D, low-B 5-string, 6-string and more — the whole fretboard recalculates for your bass and your tuning.</p>
     </div>
     <div class="feature-card" style="--accent-color:var(--green);--icon-bg:rgba(29,158,117,0.08);--icon-border:rgba(29,158,117,0.2)">
       <div class="feature-icon">🎼</div>
-      <h3>22 Chord Progressions</h3>
-      <p>Named progressions across Pop, Rock, Blues, Jazz, and more — plus a custom builder that lets you stack any chord from any key. Hit Play and hear real guitar audio as the fretboard updates live.</p>
+      <h3>Scales &amp; Arpeggios</h3>
+      <p>The full scale and mode reference, plus a chord-tone arpeggio view — the bass staple — mapped across the neck and color-coded by interval.</p>
     </div>
     <div class="feature-card" style="--accent-color:var(--gold);--icon-bg:rgba(232,200,77,0.08);--icon-border:rgba(232,200,77,0.2)">
-      <div class="feature-icon">🎯</div>
-      <h3>Position Highlighting</h3>
-      <p>Lock to any of 5 scale position boxes and the fretboard dims everything outside your box. Practice one position at a time without getting lost.</p>
+      <div class="feature-icon">📍</div>
+      <h3>Position Lock</h3>
+      <p>Pin the overlay to a 4-fret window and everything outside dims. See exactly what falls under your hand without losing the rest of the neck.</p>
     </div>
-    <div class="feature-card" style="--accent-color:var(--blue);--icon-bg:rgba(55,138,221,0.08);--icon-border:rgba(55,138,221,0.2)">
+    <div class="feature-card" style="--accent-color:var(--red);--icon-bg:rgba(226,75,74,0.08);--icon-border:rgba(226,75,74,0.2)">
       <div class="feature-icon">🔊</div>
-      <h3>Real Guitar Audio</h3>
-      <p>Hear every chord played back with real sampled guitar notes. Tap any chord in the library or let the progression player cycle through at your BPM.</p>
-    </div>
-  </div>
-</section>
-
-<!-- WHAT'S NEW IN 2.0 -->
-<section class="features-section" id="whats-new" style="padding-top:0">
-  <div class="features-header reveal">
-    <span class="section-label" style="color:var(--gold)">New in 2.0</span>
-    <h2>The biggest update<br>since launch</h2>
-    <p style="color:var(--muted);font-size:15px;margin-top:14px;max-width:540px;line-height:1.65">
-      Six new features that make Fretionary work the way real guitarists practice — across tunings, with smart suggestions, and built-in tools to keep you sharp.
-    </p>
-  </div>
-  <div class="features-grid reveal">
-    <div class="feature-card" style="--accent-color:var(--gold);--icon-bg:rgba(232,200,77,0.08);--icon-border:rgba(232,200,77,0.2)">
-      <div class="feature-icon">🎚️</div>
-      <h3>9 Alternate Tunings</h3>
-      <p>Drop D, Drop C, DADGAD, Open D / G / E, Eb &amp; D Standard. The fretboard recalculates every note for the active tuning. Standard and Drop D are free.</p>
-    </div>
-    <div class="feature-card" style="--accent-color:var(--green);--icon-bg:rgba(29,158,117,0.08);--icon-border:rgba(29,158,117,0.2)">
-      <div class="feature-icon">↪️</div>
-      <h3>Smart Resolution Hints</h3>
-      <p>Every chord shows where it commonly resolves to with the voice-leading reason — V7 → I, sus4 → major, ii° → V. Tap a card to jump straight there.</p>
-    </div>
-    <div class="feature-card" style="--accent-color:var(--red);--icon-bg:rgba(226,75,74,0.08);--icon-border:rgba(226,75,74,0.2)">
-      <div class="feature-icon">🧠</div>
-      <h3>Practice Drills</h3>
-      <p>Three modes — Name the Note, Find the Note, String Drill — across three difficulty levels. Build real fretboard memory with quick-fire rounds.</p>
+      <h3>Real Bass Audio</h3>
+      <p>Tap any note to hear it — recorded bass samples, pitched to the exact note, so it sounds like a real string fretted up and down the neck.</p>
     </div>
     <div class="feature-card" style="--accent-color:var(--blue);--icon-bg:rgba(55,138,221,0.08);--icon-border:rgba(55,138,221,0.2)">
-      <div class="feature-icon">🥁</div>
-      <h3>Built-in Metronome</h3>
-      <p>BPM 40–240, six time signatures including 6/8 and 7/8, accent + offbeat clicks, tap-tempo, and a drift-corrected timer that stays steady even at 200+ BPM.</p>
-    </div>
-    <div class="feature-card" style="--accent-color:var(--red);--icon-bg:rgba(226,75,74,0.08);--icon-border:rgba(226,75,74,0.2)">
-      <div class="feature-icon">♥️</div>
-      <h3>Favorites &amp; Recents</h3>
-      <p>Heart any chord, scale, or progression to save it for later. Recents auto-track the last 20 you've explored. One ♥ Saved sheet, available on every tab.</p>
-    </div>
-    <div class="feature-card" style="--accent-color:var(--gold);--icon-bg:rgba(232,200,77,0.08);--icon-border:rgba(232,200,77,0.2)">
-      <div class="feature-icon">📖</div>
-      <h3>Getting Started Guide</h3>
-      <p>An in-app feature catalog with Free / Pro markers on every item, plus quick-jump links to each section. Discover everything Fretionary can do in one screen.</p>
+      <div class="feature-icon">✏️</div>
+      <h3>Custom Mode</h3>
+      <p>Hand-pick any set of notes to highlight on the neck. Build your own shape, map a riff, or sketch an idea — your fretboard, your rules.</p>
     </div>
   </div>
 </section>
 
-<!-- CHORD DIAGRAMS -->
-<section class="chord-section" id="chords">
-  <div class="reveal">
-    <span class="section-label">Chord Library</span>
-    <h2>Real shapes.<br>Every key.</h2>
-    <p style="color:var(--muted);font-size:15px;margin-top:12px;max-width:480px;line-height:1.65">Voicings sourced from real guitar pedagogy — open chords, barre chords, and jazz shapes across the full neck. Not algorithmically generated. Actually playable.</p>
-  </div>
-  <div class="chord-row reveal">
-    <!-- C Major -->
-    <div class="chord-card">
-      <div class="chord-name">C Major</div>
-      <div class="chord-type">R · 3 · 5</div>
-      <svg class="mini-chord" viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg">
-        <text x="12" y="14" font-size="9" fill="#7a7870" font-family="monospace">x</text>
-        <!-- strings -->
-        <line x1="20" y1="20" x2="20" y2="140" stroke="#2a2a30" stroke-width="1.5"/>
-        <line x1="40" y1="20" x2="40" y2="140" stroke="#2a2a30" stroke-width="1.2"/>
-        <line x1="60" y1="20" x2="60" y2="140" stroke="#2a2a30" stroke-width="1.0"/>
-        <line x1="80" y1="20" x2="80" y2="140" stroke="#2a2a30" stroke-width="0.9"/>
-        <line x1="100" y1="20" x2="100" y2="140" stroke="#2a2a30" stroke-width="0.8"/>
-        <!-- frets -->
-        <line x1="20" y1="20" x2="100" y2="20" stroke="#555" stroke-width="3"/>
-        <line x1="20" y1="50" x2="100" y2="50" stroke="#2a2a30" stroke-width="1"/>
-        <line x1="20" y1="80" x2="100" y2="80" stroke="#2a2a30" stroke-width="1"/>
-        <line x1="20" y1="110" x2="100" y2="110" stroke="#2a2a30" stroke-width="1"/>
-        <line x1="20" y1="140" x2="100" y2="140" stroke="#2a2a30" stroke-width="1"/>
-        <!-- dots: A:3 D:2 G:0 B:1 e:0 -->
-        <circle cx="40" cy="95" r="9" fill="#e8c84d" stroke="#c4a000" stroke-width="1.5"/>
-        <text x="40" y="99" font-size="8" fill="#5C4400" text-anchor="middle" font-weight="700">C</text>
-        <circle cx="60" cy="65" r="9" fill="#e24b4a" stroke="#a32d2d" stroke-width="1.5"/>
-        <text x="60" y="69" font-size="8" fill="#fff" text-anchor="middle" font-weight="700">E</text>
-        <circle cx="100" cy="35" r="9" fill="#3a3a46" stroke="#52525f" stroke-width="1.5"/>
-        <text x="100" y="39" font-size="8" fill="#ccc" text-anchor="middle" font-weight="700">E</text>
-        <circle cx="80" cy="35" r="9" fill="#1d9e75" stroke="#0f6e56" stroke-width="1.5"/>
-        <text x="80" y="39" font-size="8" fill="#fff" text-anchor="middle" font-weight="700">G</text>
-        <!-- string labels -->
-        <text x="20" y="155" font-size="7" fill="#3a3835" text-anchor="middle">E</text>
-        <text x="40" y="155" font-size="7" fill="#3a3835" text-anchor="middle">A</text>
-        <text x="60" y="155" font-size="7" fill="#3a3835" text-anchor="middle">D</text>
-        <text x="80" y="155" font-size="7" fill="#3a3835" text-anchor="middle">G</text>
-        <text x="100" y="155" font-size="7" fill="#3a3835" text-anchor="middle">B</text>
-      </svg>
-    </div>
-    <!-- G Major -->
-    <div class="chord-card">
-      <div class="chord-name">G Major</div>
-      <div class="chord-type">R · 3 · 5</div>
-      <svg class="mini-chord" viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg">
-        <line x1="20" y1="20" x2="20" y2="140" stroke="#2a2a30" stroke-width="1.5"/>
-        <line x1="40" y1="20" x2="40" y2="140" stroke="#2a2a30" stroke-width="1.2"/>
-        <line x1="60" y1="20" x2="60" y2="140" stroke="#2a2a30" stroke-width="1.0"/>
-        <line x1="80" y1="20" x2="80" y2="140" stroke="#2a2a30" stroke-width="0.9"/>
-        <line x1="100" y1="20" x2="100" y2="140" stroke="#2a2a30" stroke-width="0.8"/>
-        <line x1="20" y1="20" x2="100" y2="20" stroke="#555" stroke-width="3"/>
-        <line x1="20" y1="50" x2="100" y2="50" stroke="#2a2a30" stroke-width="1"/>
-        <line x1="20" y1="80" x2="100" y2="80" stroke="#2a2a30" stroke-width="1"/>
-        <line x1="20" y1="110" x2="100" y2="110" stroke="#2a2a30" stroke-width="1"/>
-        <line x1="20" y1="140" x2="100" y2="140" stroke="#2a2a30" stroke-width="1"/>
-        <circle cx="20" cy="95" r="9" fill="#e8c84d" stroke="#c4a000" stroke-width="1.5"/>
-        <text x="20" y="99" font-size="8" fill="#5C4400" text-anchor="middle" font-weight="700">G</text>
-        <circle cx="40" cy="65" r="9" fill="#3a3a46" stroke="#52525f" stroke-width="1.5"/>
-        <text x="40" y="69" font-size="8" fill="#ccc" text-anchor="middle" font-weight="700">B</text>
-        <circle cx="100" cy="95" r="9" fill="#e8c84d" stroke="#c4a000" stroke-width="1.5"/>
-        <text x="100" y="99" font-size="8" fill="#5C4400" text-anchor="middle" font-weight="700">G</text>
-        <text x="20" y="155" font-size="7" fill="#3a3835" text-anchor="middle">E</text>
-        <text x="40" y="155" font-size="7" fill="#3a3835" text-anchor="middle">A</text>
-        <text x="60" y="155" font-size="7" fill="#3a3835" text-anchor="middle">D</text>
-        <text x="80" y="155" font-size="7" fill="#3a3835" text-anchor="middle">G</text>
-        <text x="100" y="155" font-size="7" fill="#3a3835" text-anchor="middle">B</text>
-      </svg>
-    </div>
-    <!-- Am7 -->
-    <div class="chord-card">
-      <div class="chord-name">A Min 7</div>
-      <div class="chord-type">R · b3 · 5 · b7</div>
-      <svg class="mini-chord" viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg">
-        <text x="12" y="14" font-size="9" fill="#7a7870" font-family="monospace">x</text>
-        <line x1="20" y1="20" x2="20" y2="140" stroke="#2a2a30" stroke-width="1.5"/>
-        <line x1="40" y1="20" x2="40" y2="140" stroke="#2a2a30" stroke-width="1.2"/>
-        <line x1="60" y1="20" x2="60" y2="140" stroke="#2a2a30" stroke-width="1.0"/>
-        <line x1="80" y1="20" x2="80" y2="140" stroke="#2a2a30" stroke-width="0.9"/>
-        <line x1="100" y1="20" x2="100" y2="140" stroke="#2a2a30" stroke-width="0.8"/>
-        <line x1="20" y1="20" x2="100" y2="20" stroke="#555" stroke-width="3"/>
-        <line x1="20" y1="50" x2="100" y2="50" stroke="#2a2a30" stroke-width="1"/>
-        <line x1="20" y1="80" x2="100" y2="80" stroke="#2a2a30" stroke-width="1"/>
-        <line x1="20" y1="110" x2="100" y2="110" stroke="#2a2a30" stroke-width="1"/>
-        <line x1="20" y1="140" x2="100" y2="140" stroke="#2a2a30" stroke-width="1"/>
-        <circle cx="40" cy="35" r="9" fill="#e8c84d" stroke="#c4a000" stroke-width="1.5"/>
-        <text x="40" y="39" font-size="8" fill="#5C4400" text-anchor="middle" font-weight="700">A</text>
-        <circle cx="60" cy="65" r="9" fill="#3a3a46" stroke="#52525f" stroke-width="1.5"/>
-        <text x="60" y="69" font-size="8" fill="#ccc" text-anchor="middle" font-weight="700">E</text>
-        <circle cx="80" cy="35" r="9" fill="#1d9e75" stroke="#0f6e56" stroke-width="1.5"/>
-        <text x="80" y="39" font-size="8" fill="#fff" text-anchor="middle" font-weight="700">G</text>
-        <circle cx="100" cy="35" r="9" fill="#e24b4a" stroke="#a32d2d" stroke-width="1.5"/>
-        <text x="100" y="39" font-size="8" fill="#fff" text-anchor="middle" font-weight="700">C</text>
-        <text x="20" y="155" font-size="7" fill="#3a3835" text-anchor="middle">E</text>
-        <text x="40" y="155" font-size="7" fill="#3a3835" text-anchor="middle">A</text>
-        <text x="60" y="155" font-size="7" fill="#3a3835" text-anchor="middle">D</text>
-        <text x="80" y="155" font-size="7" fill="#3a3835" text-anchor="middle">G</text>
-        <text x="100" y="155" font-size="7" fill="#3a3835" text-anchor="middle">B</text>
-      </svg>
-    </div>
-    <!-- D Major 7 -->
-    <div class="chord-card">
-      <div class="chord-name">D Maj 7</div>
-      <div class="chord-type">R · 3 · 5 · 7</div>
-      <svg class="mini-chord" viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg">
-        <text x="12" y="14" font-size="9" fill="#7a7870" font-family="monospace">x</text>
-        <text x="32" y="14" font-size="9" fill="#7a7870" font-family="monospace">x</text>
-        <line x1="20" y1="20" x2="20" y2="140" stroke="#2a2a30" stroke-width="1.5"/>
-        <line x1="40" y1="20" x2="40" y2="140" stroke="#2a2a30" stroke-width="1.2"/>
-        <line x1="60" y1="20" x2="60" y2="140" stroke="#2a2a30" stroke-width="1.0"/>
-        <line x1="80" y1="20" x2="80" y2="140" stroke="#2a2a30" stroke-width="0.9"/>
-        <line x1="100" y1="20" x2="100" y2="140" stroke="#2a2a30" stroke-width="0.8"/>
-        <line x1="20" y1="20" x2="100" y2="20" stroke="#555" stroke-width="3"/>
-        <line x1="20" y1="50" x2="100" y2="50" stroke="#2a2a30" stroke-width="1"/>
-        <line x1="20" y1="80" x2="100" y2="80" stroke="#2a2a30" stroke-width="1"/>
-        <line x1="20" y1="110" x2="100" y2="110" stroke="#2a2a30" stroke-width="1"/>
-        <line x1="20" y1="140" x2="100" y2="140" stroke="#2a2a30" stroke-width="1"/>
-        <circle cx="60" cy="35" r="9" fill="#e8c84d" stroke="#c4a000" stroke-width="1.5"/>
-        <text x="60" y="39" font-size="8" fill="#5C4400" text-anchor="middle" font-weight="700">D</text>
-        <circle cx="80" cy="65" r="9" fill="#3a3a46" stroke="#52525f" stroke-width="1.5"/>
-        <text x="80" y="69" font-size="8" fill="#ccc" text-anchor="middle" font-weight="700">A</text>
-        <circle cx="100" cy="65" r="9" fill="#e24b4a" stroke="#a32d2d" stroke-width="1.5"/>
-        <text x="100" y="69" font-size="8" fill="#fff" text-anchor="middle" font-weight="700">F#</text>
-        <text x="20" y="155" font-size="7" fill="#3a3835" text-anchor="middle">E</text>
-        <text x="40" y="155" font-size="7" fill="#3a3835" text-anchor="middle">A</text>
-        <text x="60" y="155" font-size="7" fill="#3a3835" text-anchor="middle">D</text>
-        <text x="80" y="155" font-size="7" fill="#3a3835" text-anchor="middle">G</text>
-        <text x="100" y="155" font-size="7" fill="#3a3835" text-anchor="middle">B</text>
-      </svg>
-    </div>
-    <!-- E Dom 7 -->
-    <div class="chord-card">
-      <div class="chord-name">E Dom 7</div>
-      <div class="chord-type">R · 3 · 5 · b7</div>
-      <svg class="mini-chord" viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg">
-        <line x1="20" y1="20" x2="20" y2="140" stroke="#2a2a30" stroke-width="1.5"/>
-        <line x1="40" y1="20" x2="40" y2="140" stroke="#2a2a30" stroke-width="1.2"/>
-        <line x1="60" y1="20" x2="60" y2="140" stroke="#2a2a30" stroke-width="1.0"/>
-        <line x1="80" y1="20" x2="80" y2="140" stroke="#2a2a30" stroke-width="0.9"/>
-        <line x1="100" y1="20" x2="100" y2="140" stroke="#2a2a30" stroke-width="0.8"/>
-        <line x1="20" y1="20" x2="100" y2="20" stroke="#555" stroke-width="3"/>
-        <line x1="20" y1="50" x2="100" y2="50" stroke="#2a2a30" stroke-width="1"/>
-        <line x1="20" y1="80" x2="100" y2="80" stroke="#2a2a30" stroke-width="1"/>
-        <line x1="20" y1="110" x2="100" y2="110" stroke="#2a2a30" stroke-width="1"/>
-        <line x1="20" y1="140" x2="100" y2="140" stroke="#2a2a30" stroke-width="1"/>
-        <circle cx="20" cy="35" r="9" fill="#e8c84d" stroke="#c4a000" stroke-width="1.5"/>
-        <text x="20" y="39" font-size="8" fill="#5C4400" text-anchor="middle" font-weight="700">E</text>
-        <circle cx="40" cy="65" r="9" fill="#3a3a46" stroke="#52525f" stroke-width="1.5"/>
-        <text x="40" y="69" font-size="8" fill="#ccc" text-anchor="middle" font-weight="700">B</text>
-        <circle cx="60" cy="35" r="9" fill="#1d9e75" stroke="#0f6e56" stroke-width="1.5"/>
-        <text x="60" y="39" font-size="8" fill="#fff" text-anchor="middle" font-weight="700">B</text>
-        <circle cx="80" cy="35" r="9" fill="#e24b4a" stroke="#a32d2d" stroke-width="1.5"/>
-        <text x="80" y="39" font-size="8" fill="#fff" text-anchor="middle" font-weight="700">G#</text>
-        <text x="20" y="155" font-size="7" fill="#3a3835" text-anchor="middle">E</text>
-        <text x="40" y="155" font-size="7" fill="#3a3835" text-anchor="middle">A</text>
-        <text x="60" y="155" font-size="7" fill="#3a3835" text-anchor="middle">D</text>
-        <text x="80" y="155" font-size="7" fill="#3a3835" text-anchor="middle">G</text>
-        <text x="100" y="155" font-size="7" fill="#3a3835" text-anchor="middle">B</text>
-      </svg>
-    </div>
-    <!-- F Minor -->
-    <div class="chord-card">
-      <div class="chord-name">F Minor</div>
-      <div class="chord-type">R · b3 · 5</div>
-      <svg class="mini-chord" viewBox="0 0 120 170" xmlns="http://www.w3.org/2000/svg">
-        <text x="14" y="12" font-size="8" fill="#7a7870" font-family="monospace">1fr</text>
-        <line x1="20" y1="22" x2="20" y2="150" stroke="#2a2a30" stroke-width="1.5"/>
-        <line x1="40" y1="22" x2="40" y2="150" stroke="#2a2a30" stroke-width="1.2"/>
-        <line x1="60" y1="22" x2="60" y2="150" stroke="#2a2a30" stroke-width="1.0"/>
-        <line x1="80" y1="22" x2="80" y2="150" stroke="#2a2a30" stroke-width="0.9"/>
-        <line x1="100" y1="22" x2="100" y2="150" stroke="#2a2a30" stroke-width="0.8"/>
-        <line x1="20" y1="22" x2="100" y2="22" stroke="#2a2a30" stroke-width="1.5"/>
-        <line x1="20" y1="54" x2="100" y2="54" stroke="#2a2a30" stroke-width="1"/>
-        <line x1="20" y1="86" x2="100" y2="86" stroke="#2a2a30" stroke-width="1"/>
-        <line x1="20" y1="118" x2="100" y2="118" stroke="#2a2a30" stroke-width="1"/>
-        <line x1="20" y1="150" x2="100" y2="150" stroke="#2a2a30" stroke-width="1"/>
-        <!-- Barre -->
-        <rect x="15" y="28" width="90" height="16" rx="8" fill="#378add" opacity="0.6"/>
-        <circle cx="40" cy="70" r="9" fill="#3a3a46" stroke="#52525f" stroke-width="1.5"/>
-        <text x="40" y="74" font-size="8" fill="#ccc" text-anchor="middle" font-weight="700">C</text>
-        <circle cx="60" cy="70" r="9" fill="#e24b4a" stroke="#a32d2d" stroke-width="1.5"/>
-        <text x="60" y="74" font-size="8" fill="#fff" text-anchor="middle" font-weight="700">Ab</text>
-        <circle cx="80" cy="70" r="9" fill="#1d9e75" stroke="#0f6e56" stroke-width="1.5"/>
-        <text x="80" y="74" font-size="8" fill="#fff" text-anchor="middle" font-weight="700">C</text>
-        <text x="20" y="165" font-size="7" fill="#3a3835" text-anchor="middle">E</text>
-        <text x="40" y="165" font-size="7" fill="#3a3835" text-anchor="middle">A</text>
-        <text x="60" y="165" font-size="7" fill="#3a3835" text-anchor="middle">D</text>
-        <text x="80" y="165" font-size="7" fill="#3a3835" text-anchor="middle">G</text>
-        <text x="100" y="165" font-size="7" fill="#3a3835" text-anchor="middle">B</text>
-      </svg>
-    </div>
-  </div>
-</section>
-
-<!-- CAGED SECTION -->
-<section class="caged-section" id="caged">
-  <div class="caged-inner">
+<!-- TUNINGS SECTION -->
+<section class="tunings-section" id="tunings">
+  <div class="tunings-inner">
     <div class="reveal">
-      <span class="section-label">CAGED System</span>
-      <h2>Own the entire neck.<br>Not just the open chords.</h2>
+      <span class="section-label">Tunings</span>
+      <h2>Your bass.<br>Your tuning.</h2>
       <p style="color:var(--muted);font-size:15px;margin-top:16px;line-height:1.65;max-width:420px">
-        The CAGED system links 5 repeating shapes that cover the whole neck. Once you know all 5, you can play any chord or scale anywhere — in any key, at any fret.
+        Tuning isn't an afterthought — it's the foundation. Pick your instrument and string count, and every note on the neck follows. From a 4-string in standard to a low-B 5 or a wide 6.
       </p>
       <div style="margin-top:32px;display:flex;flex-direction:column;gap:10px">
         <div style="display:flex;align-items:center;gap:12px;font-size:13px;color:var(--muted)">
-          <span style="color:var(--gold);font-weight:700;width:16px">✓</span> Interactive fretboard overlay for each shape
+          <span style="color:var(--gold);font-weight:700;width:16px">✓</span> 4, 5 and 6-string necks
         </div>
         <div style="display:flex;align-items:center;gap:12px;font-size:13px;color:var(--muted)">
-          <span style="color:var(--gold);font-weight:700;width:16px">✓</span> Caret line shows the barre fret position
+          <span style="color:var(--gold);font-weight:700;width:16px">✓</span> Standard, drop and down tunings
         </div>
         <div style="display:flex;align-items:center;gap:12px;font-size:13px;color:var(--muted)">
-          <span style="color:var(--gold);font-weight:700;width:16px">✓</span> Live cycle diagram shows how shapes connect
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;font-size:13px;color:var(--muted)">
-          <span style="color:var(--gold);font-weight:700;width:16px">✓</span> Tap any shape to view it on the fretboard
+          <span style="color:var(--gold);font-weight:700;width:16px">✓</span> Every overlay, scale and arpeggio follows the tuning
         </div>
       </div>
     </div>
-    <div class="caged-shapes reveal">
-      <div class="caged-shape" style="background:rgba(232,200,77,0.08);border-color:rgba(232,200,77,0.3);color:#e8c84d">C</div>
-      <div class="caged-shape" style="background:rgba(55,138,221,0.08);border-color:rgba(55,138,221,0.3);color:#378add">A</div>
-      <div class="caged-shape" style="background:rgba(29,158,117,0.08);border-color:rgba(29,158,117,0.3);color:#1d9e75">G</div>
-      <div class="caged-shape" style="background:rgba(226,75,74,0.08);border-color:rgba(226,75,74,0.3);color:#e24b4a">E</div>
-      <div class="caged-shape" style="background:rgba(150,100,220,0.08);border-color:rgba(150,100,220,0.3);color:#9664dc">D</div>
+    <div class="tuning-grid reveal">
+      <div class="tuning-card">
+        <div class="t-name">4-String Standard</div>
+        <div class="t-notes">E A D G</div>
+        <div class="t-meta">4-string · <span class="t-free">Free</span></div>
+      </div>
+      <div class="tuning-card">
+        <div class="t-name">Drop D</div>
+        <div class="t-notes">D A D G</div>
+        <div class="t-meta">4-string · <span class="t-free">Free</span></div>
+      </div>
+      <div class="tuning-card">
+        <div class="t-name">5-String (Low B)</div>
+        <div class="t-notes">B E A D G</div>
+        <div class="t-meta">5-string · Pro</div>
+      </div>
+      <div class="tuning-card">
+        <div class="t-name">6-String</div>
+        <div class="t-notes">B E A D G C</div>
+        <div class="t-meta">6-string · Pro</div>
+      </div>
+      <div class="tuning-card">
+        <div class="t-name">Eb Standard</div>
+        <div class="t-notes">Eb Ab Db Gb</div>
+        <div class="t-meta">4-string · Pro</div>
+      </div>
+      <div class="tuning-card">
+        <div class="t-name">BEAD · Drop C · Drop A</div>
+        <div class="t-notes">+ more</div>
+        <div class="t-meta">low &amp; extended · Pro</div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- PROGRESSIONS -->
-<section class="progressions-section" id="progressions">
+<!-- HOW IT WORKS -->
+<section class="how-section">
   <div class="reveal">
-    <span class="section-label">Chord Progressions</span>
-    <h2>Hear how chords<br>work together</h2>
+    <span class="section-label">How it works</span>
+    <h2>Faster than thinking</h2>
     <p style="color:var(--muted);font-size:15px;margin-top:12px;max-width:480px;line-height:1.65">
-      22 progressions across every genre — plus a custom builder that lets you stack any chord from any key. Hit Play and hear real guitar audio while the fretboard shows you every chord shape in sequence.
+      You're handed the changes. Three taps and you know exactly which notes lock with the chord — and where they sit under your hand.
     </p>
   </div>
-  <div class="prog-list reveal">
-    <div class="prog-item">
-      <div class="prog-item-left">
-        <span class="prog-genre">Pop</span>
-        <span class="prog-name">I – V – vi – IV</span>
-      </div>
-      <div class="prog-numerals">
-        <span class="prog-num">I</span><span class="prog-num">V</span><span class="prog-num">vi</span><span class="prog-num">IV</span>
-      </div>
+  <div class="steps reveal">
+    <div class="step">
+      <div class="step-num">01</div>
+      <h3>Pick the chord</h3>
+      <p>Set the root and chord quality. Triads, sixths and sevenths — the chords that actually show up on a chart.</p>
     </div>
-    <div class="prog-item">
-      <div class="prog-item-left">
-        <span class="prog-genre">Jazz</span>
-        <span class="prog-name">ii – V – I</span>
-      </div>
-      <div class="prog-numerals">
-        <span class="prog-num">ii</span><span class="prog-num">V</span><span class="prog-num">I</span>
-      </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <h3>Read the colors</h3>
+      <p>Root, 3rd, 5th and 7th light up across the neck. The 3rd pops — it's the note that defines the chord. The parent scale sits dimmed underneath.</p>
     </div>
-    <div class="prog-item">
-      <div class="prog-item-left">
-        <span class="prog-genre">Blues</span>
-        <span class="prog-name">12-Bar Blues</span>
-      </div>
-      <div class="prog-numerals">
-        <span class="prog-num">I</span><span class="prog-num">IV</span><span class="prog-num">V</span><span class="prog-num">IV</span>
-      </div>
-    </div>
-    <div class="prog-item">
-      <div class="prog-item-left">
-        <span class="prog-genre">Rock</span>
-        <span class="prog-name">I – IV – V</span>
-      </div>
-      <div class="prog-numerals">
-        <span class="prog-num">I</span><span class="prog-num">IV</span><span class="prog-num">V</span>
-      </div>
-    </div>
-    <div class="prog-item">
-      <div class="prog-item-left">
-        <span class="prog-genre">Folk</span>
-        <span class="prog-name">I – vi – IV – V</span>
-      </div>
-      <div class="prog-numerals">
-        <span class="prog-num">I</span><span class="prog-num">vi</span><span class="prog-num">IV</span><span class="prog-num">V</span>
-      </div>
-    </div>
-    <div class="prog-item" style="border-top:1px solid var(--border);margin-top:2px;padding-top:16px">
-      <div class="prog-item-left">
-        <span class="prog-genre" style="color:var(--gold)">+ 17 more</span>
-        <span class="prog-name" style="color:var(--muted)">Country, R&B, Modal, and more — plus your own custom builds</span>
-      </div>
-      <a href="#pricing" style="font-size:12px;color:var(--gold);text-decoration:none;font-weight:600">Explore →</a>
+    <div class="step">
+      <div class="step-num">03</div>
+      <h3>Lock your position</h3>
+      <p>Pin a 4-fret window to your hand and the rest of the neck dims. Tap to hear it. Now you're playing the changes, not hunting for them.</p>
     </div>
   </div>
 </section>
@@ -1270,7 +896,7 @@
 <section class="pricing-section" id="pricing">
   <div class="reveal">
     <span class="section-label">Simple pricing</span>
-    <h2>Start free.<br>Go deeper when you're ready.</h2>
+    <h2>Start free.<br>Own it forever when you're ready.</h2>
   </div>
   <div class="pricing-cards">
     <div class="pricing-card reveal">
@@ -1278,17 +904,14 @@
       <div class="pricing-price">$0</div>
       <div class="pricing-per">forever</div>
       <ul class="pricing-features">
-        <li>Interactive fretboard</li>
-        <li>4 essential scales (Major, Minor, Pentatonic, Blues)</li>
-        <li>8 core chord types with voicings</li>
-        <li>4 starter progressions</li>
+        <li>Chord-tone overlay (triads)</li>
+        <li>Scale &amp; arpeggio reference</li>
         <li>Standard + Drop D tunings</li>
-        <li>Smart resolution hints</li>
-        <li>CAGED system guide</li>
+        <li>Tap-to-hear bass audio</li>
+        <li>Position lock &amp; scale underlay</li>
         <li>Favorites &amp; recents</li>
-        <li>Practice — Name the Note (Beginner)</li>
       </ul>
-      <a href="/download" class="pricing-btn">Download Free</a>
+      <a href="#" class="pricing-btn">Download Free</a>
     </div>
     <div class="pricing-card reveal">
       <div class="pricing-tier">Monthly</div>
@@ -1296,16 +919,13 @@
       <div class="pricing-per">per month — cancel anytime</div>
       <ul class="pricing-features">
         <li>Everything in Free</li>
-        <li>All 14 scales &amp; modes</li>
-        <li>Full chord library (36 types)</li>
-        <li>All 22 progressions + custom builder</li>
-        <li>9 alternate tunings (Drop C, DADGAD, Open D/G/E…)</li>
-        <li>Real guitar audio playback</li>
-        <li>All Practice modes &amp; difficulties</li>
+        <li>All chords, incl. 7ths</li>
+        <li>All scales &amp; modes</li>
+        <li>All tunings (4 / 5 / 6-string)</li>
+        <li>Custom mode</li>
         <li>Built-in metronome</li>
-        <li>Position highlighting (Pos 1–5)</li>
       </ul>
-      <a href="/download" class="pricing-btn">Subscribe Monthly</a>
+      <a href="#" class="pricing-btn">Subscribe Monthly</a>
     </div>
     <div class="pricing-card featured reveal">
       <div class="pricing-badge">Best Value</div>
@@ -1317,18 +937,17 @@
         <li>Pay once, own forever</li>
         <li>All future updates</li>
         <li>No recurring charge</li>
-        <li>Priority support</li>
       </ul>
-      <a href="/download" class="pricing-btn">Buy Lifetime</a>
+      <a href="#" class="pricing-btn">Buy Lifetime</a>
     </div>
   </div>
-  <p style="margin-top:32px;font-size:12px;color:var(--faint)">Available on iOS and Android.</p>
+  <p style="margin-top:32px;font-size:12px;color:var(--faint)">Coming soon to iOS and Android.</p>
 </section>
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-logo">Fretionary<span>.</span></div>
-  <div class="footer-copy">© 2025 Renmus Software LLC. All rights reserved.</div>
+  <div class="footer-logo">Fretionary<span>.</span> Bass</div>
+  <div class="footer-copy">© 2026 Renmus Software LLC. All rights reserved.</div>
 </footer>
 
 <script>
@@ -1342,10 +961,10 @@
     fretLines.appendChild(el);
   });
 
-  // ── Build string lines ──
+  // ── Build string lines (4-string bass) ──
   const stringLines = document.getElementById('stringLines');
-  const stringYs = [20,70,130,185,240,295];
-  const stringThicknesses = [2.5,2.2,1.8,1.4,1.1,0.9];
+  const stringYs = [40,110,180,250];
+  const stringThicknesses = [1.1,1.6,2.1,2.6];
   stringYs.forEach((y, i) => {
     const el = document.createElement('div');
     el.className = 'string-line';
@@ -1354,7 +973,7 @@
   });
 
   // ── Floating note dots ──
-  const notes = ['A','C','E','G','B','D','F#','Bb','Db','Ab'];
+  const notes = ['E','G','B','D','A','C','F#','C#','Bb','Eb'];
   const colors = ['#e8c84d','#e24b4a','#1d9e75','#378add'];
   const noteDots = document.getElementById('noteDots');
   for(let i=0; i<12; i++) {
@@ -1371,117 +990,89 @@
     noteDots.appendChild(el);
   }
 
-  // ── Draw main fretboard ──
+  // ── Draw the bass overlay fretboard (4 strings: G D A E, high→low) ──
   const svg = document.getElementById('mainFretboard');
-  const W = 860, H = 200;
-  const strings = 6, frets = 12;
-  const padLeft = 60, padRight = 20, padTop = 30, padBottom = 30;
+  const W = 860, H = 180;
+  const strings = 4, frets = 12;
+  const padLeft = 60, padRight = 20, padTop = 28, padBottom = 28;
   const fw = (W - padLeft - padRight) / frets;
   const sh = (H - padTop - padBottom) / (strings - 1);
 
+  function svgEl(tag, attrs) {
+    const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    for (const k in attrs) el.setAttribute(k, attrs[k]);
+    svg.appendChild(el);
+    return el;
+  }
   function line(x1,y1,x2,y2,color,width,opacity=1) {
-    const el = document.createElementNS('http://www.w3.org/2000/svg','line');
-    el.setAttribute('x1',x1);el.setAttribute('y1',y1);
-    el.setAttribute('x2',x2);el.setAttribute('y2',y2);
-    el.setAttribute('stroke',color);el.setAttribute('stroke-width',width);
-    el.setAttribute('opacity',opacity);
-    svg.appendChild(el);
-    return el;
+    return svgEl('line',{x1,y1,x2,y2,stroke:color,'stroke-width':width,opacity});
   }
-  function circle(cx,cy,r,fill,stroke,sw) {
-    const el = document.createElementNS('http://www.w3.org/2000/svg','circle');
-    el.setAttribute('cx',cx);el.setAttribute('cy',cy);el.setAttribute('r',r);
-    el.setAttribute('fill',fill);el.setAttribute('stroke',stroke);el.setAttribute('stroke-width',sw);
-    svg.appendChild(el);
-    return el;
+  function circle(cx,cy,r,fill,stroke,sw,opacity=1) {
+    return svgEl('circle',{cx,cy,r,fill,stroke,'stroke-width':sw,opacity});
   }
-  function text(x,y,content,size,color,anchor='middle',weight='400') {
-    const el = document.createElementNS('http://www.w3.org/2000/svg','text');
-    el.setAttribute('x',x);el.setAttribute('y',y);
-    el.setAttribute('font-size',size);el.setAttribute('fill',color);
-    el.setAttribute('text-anchor',anchor);el.setAttribute('font-weight',weight);
-    el.setAttribute('font-family','DM Mono, monospace');
+  function text(x,y,content,size,color,weight='400') {
+    const el = svgEl('text',{x,y,'font-size':size,fill:color,'text-anchor':'middle','font-weight':weight,'font-family':'DM Mono, monospace'});
     el.textContent = content;
-    svg.appendChild(el);
     return el;
   }
 
-  // Nut
-  line(padLeft, padTop, padLeft, H-padBottom, '#888', 4);
+  // Position-lock band (frets 0–3) behind everything
+  svgEl('rect',{x:padLeft, y:padTop-14, width:3*fw+fw*0.5, height:(strings-1)*sh+28, rx:10, fill:'#e8c84d', opacity:0.05});
 
-  // Fret lines
-  for(let f=1; f<=frets; f++) {
-    const x = padLeft + f*fw;
-    line(x, padTop, x, H-padBottom, '#2a2a30', 1);
-  }
+  // Nut + frets
+  line(padLeft, padTop-2, padLeft, H-padBottom+2, '#888', 4);
+  for(let f=1; f<=frets; f++) line(padLeft + f*fw, padTop, padLeft + f*fw, H-padBottom, '#2a2a30', 1);
 
-  // String lines (thicker = lower)
-  const stringThick = [2.4,2.0,1.6,1.3,1.0,0.8];
-  for(let s=0; s<strings; s++) {
-    const y = padTop + s*sh;
-    line(padLeft, y, W-padRight, y, '#3a3a46', stringThick[s]);
-  }
+  // Strings (thicker = lower, bottom row)
+  const stringThick = [0.9,1.3,1.8,2.4];
+  for(let s=0; s<strings; s++) line(padLeft, padTop+s*sh, W-padRight, padTop+s*sh, '#3a3a46', stringThick[s]);
 
-  // String labels
-  const strLabels = ['E','A','D','G','B','e'];
-  for(let s=0; s<strings; s++) {
-    const y = padTop + s*sh;
-    text(padLeft-14, y+4, strLabels[s], 11, '#3a3835');
-  }
+  // String labels (G D A E, high→low)
+  const strLabels = ['G','D','A','E'];
+  for(let s=0; s<strings; s++) text(padLeft-16, padTop+s*sh+4, strLabels[s], 11, '#3a3835');
 
-  // Fret markers
+  // Inlay markers
   [3,5,7,9,12].forEach(f => {
-    const x = padLeft + (f-0.5)*fw;
-    const y = H/2;
-    if(f===12){circle(x,y-sh/2,4,'#2a2a30','none',0);circle(x,y+sh/2,4,'#2a2a30','none',0);}
-    else{circle(x,y,4,'#2a2a30','none',0);}
+    const x = padLeft + (f-0.5)*fw, y = padTop + 1.5*sh;
+    if(f===12){circle(x,y-sh*0.9,3.5,'#2a2a30','none',0);circle(x,y+sh*0.9,3.5,'#2a2a30','none',0);}
+    else circle(x,y,3.5,'#2a2a30','none',0);
   });
 
-  // A minor pentatonic: notes A C D E G
-  // OPEN_STRINGS (low to high): E2 A2 D3 G3 B3 E4
-  // String 0 (E2=40): frets 5(A),7(B),8(C)... pentatonic: 5(A),7(C) wait
-  // A minor penta intervals: 0,3,5,7,10 = A,C,D,E,G
-  // Actually let's just hardcode nice looking positions
-  const dots = [
-    // [string_0_low_E, fret, note, color]
-    [0,5,'A','#e8c84d','#c4a000','#5C4400'],  // E string fret 5 = A (root)
-    [0,8,'C','#e24b4a','#a32d2d','#fff'],       // E string fret 8
-    [1,5,'A','#e8c84d','#c4a000','#5C4400'],  // A string fret 5 (root)
-    [1,7,'B','#1d9e75','#0f6e56','#fff'],
-    [2,5,'D','#1d9e75','#0f6e56','#fff'],
-    [2,7,'E','#3a3a46','#52525f','#ccc'],
-    [3,4,'C','#e24b4a','#a32d2d','#fff'],
-    [3,5,'D','#1d9e75','#0f6e56','#fff'],
-    [3,7,'E','#3a3a46','#52525f','#ccc'],
-    [4,5,'A','#e8c84d','#c4a000','#5C4400'],  // B string fret 5 = E? no
-    [4,5,'A','#e8c84d','#c4a000','#5C4400'],
-    [4,8,'C','#e24b4a','#a32d2d','#fff'],
-    [5,5,'A','#e8c84d','#c4a000','#5C4400'],
-    [5,7,'B','#3a3a46','#52525f','#ccc'],
-    [5,8,'C','#e24b4a','#a32d2d','#fff'],
+  // Role palette
+  const ROLE = {
+    root:  ['#e8c84d','#c4a000','#5C4400'],
+    third: ['#e24b4a','#a32d2d','#fff'],
+    fifth: ['#1d9e75','#0f6e56','#fff'],
+    seventh:['#378add','#1f5e9e','#fff'],
+    scale: ['#3a3a46','#52525f','#cfcfcf'],
+  };
+
+  // E Minor 7 overlay (E G B D) over E Dorian. [stringRow(0=G top), fret, label, role]
+  const overlay = [
+    // chord tones
+    [3, 0, 'R', 'root'],     // E string open = E
+    [1, 2, 'R', 'root'],     // D string fret 2 = E
+    [3, 3, '3', 'third'],    // E string fret 3 = G
+    [0, 0, '3', 'third'],    // G string open = G
+    [2, 2, '5', 'fifth'],    // A string fret 2 = B
+    [0, 4, '5', 'fifth'],    // G string fret 4 = B
+    [1, 0, '7', 'seventh'],  // D string open = D
+    [2, 5, '7', 'seventh'],  // A string fret 5 = D
+    // dimmed scale tones (E Dorian)
+    [2, 0, '', 'scale'],     // A string open = A
+    [3, 2, '', 'scale'],     // E fret 2 = F#
+    [1, 4, '', 'scale'],     // D fret 4 = F#
+    [0, 2, '', 'scale'],     // G fret 2 = A
+    [2, 4, '', 'scale'],     // A fret 4 = C#
   ];
 
-  // Actually just draw a nice looking A minor pentatonic box at position 5
-  const amPenta = [
-    [0, 5, 'A', '#e8c84d', '#c4a000', '#5C4400'],
-    [0, 8, 'C', '#e24b4a', '#a32d2d', '#fff'],
-    [1, 5, 'A', '#e8c84d', '#c4a000', '#5C4400'],
-    [1, 7, 'G', '#1d9e75', '#0f6e56', '#fff'],
-    [2, 5, 'D', '#1d9e75', '#0f6e56', '#fff'],
-    [2, 7, 'E', '#3a3a46', '#52525f', '#ccc'],
-    [3, 5, 'A', '#e8c84d', '#c4a000', '#5C4400'],
-    [3, 7, 'C', '#e24b4a', '#a32d2d', '#fff'],
-    [4, 5, 'E', '#3a3a46', '#52525f', '#ccc'],
-    [4, 8, 'G', '#1d9e75', '#0f6e56', '#fff'],
-    [5, 5, 'A', '#e8c84d', '#c4a000', '#5C4400'],
-    [5, 8, 'C', '#e24b4a', '#a32d2d', '#fff'],
-  ];
-
-  amPenta.forEach(([s, f, note, fill, stroke, textColor]) => {
-    const cx = padLeft + (f - 0.5) * fw;
+  overlay.forEach(([s, f, label, role]) => {
+    const cx = f === 0 ? padLeft : padLeft + (f - 0.5) * fw;
     const cy = padTop + s * sh;
-    circle(cx, cy, 12, fill, stroke, 1.5);
-    text(cx, cy + 4, note, 9, textColor, 'middle', '600');
+    const [fill, stroke, txt] = ROLE[role];
+    const scale = role === 'scale';
+    circle(cx, cy, scale ? 9 : 13, fill, stroke, 1.5, scale ? 0.85 : 1);
+    if (label) text(cx, cy + 4, label, 10, txt, '700');
   });
 
   // ── Scroll reveal ──
@@ -1493,18 +1084,12 @@
   // ── Mobile hamburger menu ──
   const hamburger = document.getElementById('hamburger');
   const mobileMenu = document.getElementById('mobileMenu');
-
   function toggleMenu(open) {
     hamburger.classList.toggle('open', open);
     mobileMenu.classList.toggle('open', open);
     document.body.style.overflow = open ? 'hidden' : '';
   }
-
-  hamburger.addEventListener('click', () => {
-    toggleMenu(!mobileMenu.classList.contains('open'));
-  });
-
-  // Close menu and smooth scroll when a link is clicked
+  hamburger.addEventListener('click', () => toggleMenu(!mobileMenu.classList.contains('open')));
   document.querySelectorAll('.mobile-link').forEach(link => {
     link.addEventListener('click', e => {
       const href = link.getAttribute('href');
@@ -1514,17 +1099,13 @@
         setTimeout(() => {
           const target = document.querySelector(href);
           if (target) target.scrollIntoView({ behavior: 'smooth' });
-        }, 250); // wait for menu close animation
+        }, 250);
       } else {
         toggleMenu(false);
       }
     });
   });
-
-  // Close on backdrop tap (tapping outside the links)
-  mobileMenu.addEventListener('click', e => {
-    if (e.target === mobileMenu) toggleMenu(false);
-  });
+  mobileMenu.addEventListener('click', e => { if (e.target === mobileMenu) toggleMenu(false); });
 </script>
 </body>
 </html>
