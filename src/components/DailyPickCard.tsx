@@ -18,6 +18,7 @@ export default function DailyPickCard() {
   const setScaleKey = useStore(s => s.setScaleKey);
   const setChordKey = useStore(s => s.setChordKey);
   const setMode = useStore(s => s.setMode);
+  const currentStreak = useStore(s => s.currentStreak);
 
   function applyPick() {
     setRoot(pick.root);
@@ -35,7 +36,12 @@ export default function DailyPickCard() {
   return (
     <TouchableOpacity style={styles.card} onPress={applyPick} activeOpacity={0.85}>
       <View style={{ flex: 1 }}>
-        <Text style={styles.eyebrow}>{eyebrow}</Text>
+        <View style={styles.eyebrowRow}>
+          <Text style={styles.eyebrow}>{eyebrow}</Text>
+          {currentStreak > 0 && (
+            <Text style={styles.streak}>🔥 {currentStreak} day streak</Text>
+          )}
+        </View>
         <Text style={styles.title} numberOfLines={1}>{pick.fullName}</Text>
         <Text style={styles.desc} numberOfLines={2}>{pick.description}</Text>
       </View>
@@ -57,13 +63,24 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(232,212,77,0.32)',
     backgroundColor: 'rgba(232,212,77,0.05)',
   },
+  eyebrowRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
   eyebrow: {
     fontSize: 10,
     fontWeight: '700',
     color: '#E8D44D',
     letterSpacing: 1.5,
     fontFamily: FONT_FAMILY.mono,
-    marginBottom: 6,
+  },
+  streak: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#E8D44D',
+    letterSpacing: 0.2,
   },
   title: {
     fontSize: 18,
