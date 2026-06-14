@@ -68,6 +68,19 @@
             "minSdkVersion": 24
           }
         }
+      ],
+      [
+        "react-native-fbsdk-next",
+        {
+          "appID": "1718755715795613",
+          "clientToken": "PLACEHOLDER_META_CLIENT_TOKEN",
+          "displayName": "Fretionary Bass",
+          "scheme": "fb1718755715795613",
+          "advertiserIDCollectionEnabled": true,
+          "autoLogAppEventsEnabled": true,
+          "isAutoInitEnabled": true,
+          "iosUserTrackingPermission": "Allow Fretionary Bass to use your activity to help us improve and personalize ads. This helps keep the app free and the Pro tier affordable."
+        }
       ]
     ],
     "scheme": "fretionarybass",
@@ -79,7 +92,7 @@
       "eas": {
         "projectId": "95aea364-4dd4-46b8-ae3a-909d8c352599"
       },
-      "_note_fbsdk": "Meta SDK (react-native-fbsdk-next) plugin intentionally omitted until a real Meta app is provisioned. Re-add the plugin block with the real appID + clientToken — the generated fb<appID> URL scheme must be valid, App Store rejects placeholder schemes (ITMS-90158)."
+      "_note_fbsdk": "Meta appID 1718755715795613 is real; the fb<appID> URL scheme is now valid. STILL NEEDED: replace clientToken (PLACEHOLDER_META_CLIENT_TOKEN) with the real Client Token from Meta App Dashboard → App settings → Advanced → Security → Client token. The build/submit will pass without it, but app events won't send until it's set."
     },
     "owner": "renmussoftware"
   }
