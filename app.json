@@ -14,10 +14,19 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.renmussoftware.fretionarybass",
-      "buildNumber": "1",
+      "buildNumber": "3",
       "infoPlist": {
         "UIBackgroundModes": [],
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSUserTrackingUsageDescription": "Allow Fretionary Bass to use your activity to help us improve and personalize ads. This helps keep the app free and the Pro tier affordable.",
+        "SKAdNetworkItems": [
+          {
+            "SKAdNetworkIdentifier": "v9wttpbfk9.skadnetwork"
+          },
+          {
+            "SKAdNetworkIdentifier": "n38lu8286q.skadnetwork"
+          }
+        ]
       },
       "appleTeamId": "KHWB32323Q"
     },
@@ -30,7 +39,11 @@
       "package": "com.renmussoftware.fretionarybass",
       "versionCode": 1,
       "predictiveBackGestureEnabled": false,
-      "permissions": [],
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.INTERNET"
+      ],
       "blockedPermissions": [
         "android.permission.RECORD_AUDIO"
       ]
@@ -55,19 +68,6 @@
             "minSdkVersion": 24
           }
         }
-      ],
-      [
-        "react-native-fbsdk-next",
-        {
-          "appID": "PLACEHOLDER_META_APP_ID",
-          "clientToken": "PLACEHOLDER_META_CLIENT_TOKEN",
-          "displayName": "Fretionary Bass",
-          "scheme": "fbPLACEHOLDER_META_APP_ID",
-          "advertiserIDCollectionEnabled": true,
-          "autoLogAppEventsEnabled": true,
-          "isAutoInitEnabled": true,
-          "iosUserTrackingPermission": "Allow Fretionary Bass to use your activity to help us improve and personalize ads. This helps keep the app free and the Pro tier affordable."
-        }
       ]
     ],
     "scheme": "fretionarybass",
@@ -75,7 +75,12 @@
       "typedRoutes": true
     },
     "extra": {
-      "router": {}
-    }
+      "router": {},
+      "eas": {
+        "projectId": "95aea364-4dd4-46b8-ae3a-909d8c352599"
+      },
+      "_note_fbsdk": "Meta SDK (react-native-fbsdk-next) plugin intentionally omitted until a real Meta app is provisioned. Re-add the plugin block with the real appID + clientToken — the generated fb<appID> URL scheme must be valid, App Store rejects placeholder schemes (ITMS-90158)."
+    },
+    "owner": "renmussoftware"
   }
 }
