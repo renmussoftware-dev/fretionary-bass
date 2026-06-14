@@ -9,6 +9,8 @@ import { COLORS, SPACE, RADIUS, FONT_FAMILY } from '../../src/constants/theme';
 import { NOTES, NOTE_DISPLAY, CHORDS, COLORS as MUSIC_COLORS } from '../../src/constants/music';
 import { useStore } from '../../src/store/useStore';
 import { OVERLAY_CHORDS, suggestScaleForChord } from '../../src/utils/overlay';
+import { useProGate } from '../../src/hooks/useProGate';
+import { isChordFree } from '../../src/constants/subscription';
 
 const LABEL_OPTIONS = [
   { label: 'Interval', value: 'interval' },
@@ -47,6 +49,7 @@ export default function OverlayScreen() {
     overlayFret, setOverlayFret,
   } = useStore();
   const currentStreak = useStore(s => s.currentStreak);
+  const { isPro, requirePro } = useProGate();
 
   const chord = CHORDS[chordKey];
   const activeChord = OVERLAY_CHORDS.find(c => c.key === chordKey);
@@ -121,23 +124,31 @@ export default function OverlayScreen() {
       </View>
 
       <ScrollView style={styles.controls} showsVerticalScrollIndicator={false}>
-        {/* Chord picker */}
+        {/* Chord picker — triads are free; 6ths/7ths/altered are Pro */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Chord</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.pillRow}>
             {OVERLAY_CHORDS.map(c => {
               const active = c.key === chordKey;
+              const locked = !isPro && !isChordFree(c.key);
               return (
                 <TouchableOpacity key={c.key}
-                  onPress={() => setChordKey(c.key)}
-                  style={[styles.pill, active && styles.pillActive]}
+                  onPress={() => locked ? requirePro(() => setChordKey(c.key)) : setChordKey(c.key)}
+                  style={[styles.pill, active && styles.pillActive, locked && styles.pillLocked]}
                   activeOpacity={0.7}>
-                  <Text style={[styles.pillText, active && styles.pillTextActive]}>{c.label}</Text>
+                  <Text style={[styles.pillText, active && styles.pillTextActive]}>
+                    {locked ? '🔒 ' : ''}{c.label}
+                  </Text>
                 </TouchableOpacity>
               );
             })}
           </ScrollView>
+          {!isPro && (
+            <TouchableOpacity onPress={() => requirePro(() => {})} activeOpacity={0.7}>
+              <Text style={styles.upgradeHint}>🔒 Unlock all chords &amp; 7ths with Pro →</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* What to play */}
@@ -302,8 +313,14 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: 'transparent',
   },
   pillActive: { backgroundColor: COLORS.accentSoft, borderColor: COLORS.accent },
+  pillLocked: { opacity: 0.5 },
   pillText: { fontSize: 13, fontWeight: '500', color: COLORS.textMuted, letterSpacing: 0.1 },
   pillTextActive: { color: COLORS.text, fontWeight: '600' },
+
+  upgradeHint: {
+    fontSize: 12, fontWeight: '600', color: COLORS.accent,
+    paddingHorizontal: SPACE.lg, paddingTop: SPACE.md,
+  },
 
   toneSummary: {
     fontSize: 14, color: COLORS.text,
