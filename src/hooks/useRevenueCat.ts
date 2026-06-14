@@ -8,8 +8,9 @@ import { Platform } from 'react-native';
 import { useStore } from '../store/useStore';
 import { linkFacebookAnonymousIDToRevenueCat } from '../utils/analytics';
 
-// New RevenueCat project for Fretionary Bass — provision real keys before ship.
-const REVENUECAT_API_KEY_IOS = 'PLACEHOLDER_REVENUECAT_IOS_KEY';
+// RevenueCat public SDK keys (safe to ship in the binary).
+// iOS: real. Android: still a placeholder — set the goog_… key before Android ships.
+const REVENUECAT_API_KEY_IOS = 'appl_cGHuCyDdGmLNVmAjEALhBqrbEVt';
 const REVENUECAT_API_KEY_ANDROID = 'PLACEHOLDER_REVENUECAT_ANDROID_KEY';
 const ENTITLEMENT_ID = 'Renmus Software LLC Pro';
 
