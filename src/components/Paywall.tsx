@@ -192,9 +192,14 @@ export default function Paywall({ onClose, onSuccess }: Props) {
                   </View>
                 )}
                 <View style={styles.cardTop}>
-                  <Text style={[styles.cardTitle, highlight && styles.cardTitleHighlight]}>{title}</Text>
+                  <View style={styles.titleWrap}>
+                    <View style={[styles.radio, selected && styles.radioOn]}>
+                      {selected && <Text style={styles.radioCheck}>✓</Text>}
+                    </View>
+                    <Text style={styles.cardTitle}>{title}</Text>
+                  </View>
                   <View style={styles.priceWrap}>
-                    <Text style={[styles.price, highlight && styles.priceHighlight]}>
+                    <Text style={[styles.price, selected && styles.priceSelected]}>
                       {pkg.product.priceString}
                     </Text>
                     <Text style={styles.pricePer}>
@@ -205,13 +210,10 @@ export default function Paywall({ onClose, onSuccess }: Props) {
                 <View style={styles.divider} />
                 {features.map((f, fi) => (
                   <View key={fi} style={styles.featureRow}>
-                    <Text style={[styles.check, highlight && styles.checkHighlight]}>✓</Text>
+                    <Text style={[styles.check, selected && styles.checkSelected]}>✓</Text>
                     <Text style={styles.featureText}>{f}</Text>
                   </View>
                 ))}
-                {selected && (
-                  <View style={styles.selectedDot} />
-                )}
               </TouchableOpacity>
             );
           })
@@ -295,29 +297,33 @@ const styles = StyleSheet.create({
 
   noPackages:       { color: COLORS.textMuted, textAlign: 'center', padding: SPACE.xl, lineHeight: 22 },
 
-  card:             { backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 1.5, borderColor: COLORS.border, padding: SPACE.lg, marginBottom: SPACE.md, position: 'relative' },
-  cardHighlight:    { borderColor: COLORS.accent, backgroundColor: '#18160a' },
-  cardSelected:     { borderWidth: 2 },
+  // Border thickness is constant (2) so selecting a card doesn't shift layout —
+  // only the color/fill change. Selection owns the accent treatment; the
+  // "BEST VALUE" badge is just a label on the featured (Lifetime) card.
+  card:             { backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 2, borderColor: COLORS.border, padding: SPACE.lg, marginBottom: SPACE.md, position: 'relative' },
+  cardHighlight:    { backgroundColor: COLORS.surfaceHigh },
+  cardSelected:     { borderColor: COLORS.accent, backgroundColor: COLORS.accentSoft },
 
   badge:            { position: 'absolute', top: -14, alignSelf: 'center', backgroundColor: COLORS.accent, paddingHorizontal: 12, paddingVertical: 3, borderRadius: 100 },
-  badgeText:        { fontSize: 10, fontWeight: '800', color: '#1a1400', letterSpacing: 1 },
+  badgeText:        { fontSize: 10, fontWeight: '800', color: '#fff', letterSpacing: 1 },
 
   cardTop:          { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACE.md },
+  titleWrap:        { flexDirection: 'row', alignItems: 'center', gap: 10, flexShrink: 1 },
+  radio:            { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: COLORS.borderLight, alignItems: 'center', justifyContent: 'center' },
+  radioOn:          { backgroundColor: COLORS.accent, borderColor: COLORS.accent },
+  radioCheck:       { color: '#fff', fontSize: 13, fontWeight: '800', lineHeight: 15 },
   cardTitle:        { fontSize: 18, fontWeight: '700', color: COLORS.text },
-  cardTitleHighlight: { color: COLORS.accent },
   priceWrap:        { flexDirection: 'row', alignItems: 'baseline', gap: 3 },
   price:            { fontSize: 24, fontWeight: '800', color: COLORS.text },
-  priceHighlight:   { color: COLORS.accent },
+  priceSelected:    { color: COLORS.accent },
   pricePer:         { fontSize: 12, color: COLORS.textMuted },
 
   divider:          { height: 1, backgroundColor: COLORS.border, marginBottom: SPACE.md },
 
   featureRow:       { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 },
   check:            { color: COLORS.textMuted, fontWeight: '700', fontSize: 13 },
-  checkHighlight:   { color: COLORS.accent },
+  checkSelected:    { color: COLORS.accent },
   featureText:      { fontSize: 13, color: COLORS.textMuted, flex: 1 },
-
-  selectedDot:      { position: 'absolute', top: 12, right: 12, width: 10, height: 10, borderRadius: 5, backgroundColor: COLORS.accent },
 
   freeNote:         { alignItems: 'center', paddingVertical: SPACE.md },
   freeNoteText:     { fontSize: 12, color: COLORS.textMuted },
