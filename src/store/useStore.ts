@@ -40,6 +40,16 @@ function yesterdayKey(): string {
 export type AppMode = 'scales' | 'chords' | 'custom';
 export type LabelMode = 'name' | 'degree' | 'interval' | 'none';
 
+export type ScalePlaybackSpeed = 'slow' | 'normal' | 'fast';
+
+// Per-step delay (ms) for scale playback. Slow lets students track each
+// highlighted note; fast is for fluent practice.
+export const SCALE_SPEED_MS: Record<ScalePlaybackSpeed, number> = {
+  slow:   500,
+  normal: 280,
+  fast:   150,
+};
+
 export type SavedItem =
   | { kind: 'scale'; root: number; scaleKey: string; addedAt: number }
   | { kind: 'chord'; root: number; chordKey: string; addedAt: number };
@@ -77,6 +87,15 @@ interface AppState {
   overlayFret: number | null;
   setOverlayUnderlay: (v: boolean) => void;
   setOverlayFret: (f: number | null) => void;
+
+  // ── Scale playback ─────────────────────────────────────────────────────────
+  // playbackHighlight: pitch class (0–11) currently sounding, or null. The
+  // Fretboard lights up every position matching it. scalePlaybackSpeed: the
+  // per-note delay preset.
+  playbackHighlight: number | null;
+  setPlaybackHighlight: (pitchClass: number | null) => void;
+  scalePlaybackSpeed: ScalePlaybackSpeed;
+  setScalePlaybackSpeed: (speed: ScalePlaybackSpeed) => void;
 
   favorites: SavedItem[];
   recents: SavedItem[];
@@ -142,6 +161,11 @@ export const useStore = create<AppState>()(
       overlayFret: null,
       setOverlayUnderlay: (overlayUnderlay) => set({ overlayUnderlay }),
       setOverlayFret: (overlayFret) => set({ overlayFret }),
+
+      playbackHighlight: null,
+      scalePlaybackSpeed: 'normal',
+      setPlaybackHighlight: (playbackHighlight) => set({ playbackHighlight }),
+      setScalePlaybackSpeed: (scalePlaybackSpeed) => set({ scalePlaybackSpeed }),
 
       favorites: [],
       recents: [],
@@ -253,6 +277,7 @@ export const useStore = create<AppState>()(
         tuningId: s.tuningId,
         labelMode: s.labelMode,
         overlayUnderlay: s.overlayUnderlay,
+        scalePlaybackSpeed: s.scalePlaybackSpeed,
         favorites: s.favorites,
         recents: s.recents,
         customNotes: s.customNotes,

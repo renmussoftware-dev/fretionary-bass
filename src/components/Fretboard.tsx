@@ -38,6 +38,7 @@ export default function Fretboard() {
   const SVG_W = LEFT_PAD + NUT_W + TOTAL_FRETS * FRET_W + 18;
 
   const { root, scaleKey, chordKey, mode, labelMode, activePosition, tuningId, customNotes } = useStore();
+  const playbackHighlight = useStore(s => s.playbackHighlight);
 
   const activeTuning = getTuning(tuningId);
   const noteClasses = useMemo(() => tuningNoteClasses(activeTuning), [activeTuning]);
@@ -140,6 +141,11 @@ export default function Fretboard() {
             <Stop offset="0%" stopColor={MUSIC_COLORS.root.fill} stopOpacity="0.45" />
             <Stop offset="100%" stopColor={MUSIC_COLORS.root.fill} stopOpacity="0" />
           </RadialGradient>
+          {/* White glow marking the currently-playing note during scale playback. */}
+          <RadialGradient id="playGlow" cx="50%" cy="50%" r="50%">
+            <Stop offset="0%" stopColor="#ffffff" stopOpacity="0.7" />
+            <Stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+          </RadialGradient>
         </Defs>
 
         {/* Inlay dots — positioned relative to the neck's vertical center so
@@ -223,15 +229,24 @@ export default function Fretboard() {
             const y = strY(s);
             const label = noteLabel(ni, root, labelMode, scaleKey, chordKey, mode);
             const fs = label.length > 2 ? 7 : 9;
-            const r = DOT_R * col.scale;
+            // When this pitch class is the one currently sounding in scale
+            // playback, pop the dot and add a white ring + glow so every
+            // position of that note lights up across the neck.
+            const isPlaying = playbackHighlight !== null && ni === playbackHighlight;
+            const r = DOT_R * col.scale * (isPlaying ? 1.35 : 1);
             return (
               <G key={`${s}-${f}`} opacity={col.opacity}>
                 {col.isRoot && col.opacity === 1 && (
                   <Circle cx={x} cy={y} r={DOT_R + 6} fill="url(#rootGlow)" />
                 )}
+                {isPlaying && (
+                  <Circle cx={x} cy={y} r={DOT_R + 10} fill="url(#playGlow)" />
+                )}
                 <Circle
                   cx={x} cy={y} r={r}
-                  fill={col.fill} stroke={col.stroke} strokeWidth={1}
+                  fill={col.fill}
+                  stroke={isPlaying ? '#ffffff' : col.stroke}
+                  strokeWidth={isPlaying ? 2.5 : 1}
                 />
                 {label ? (
                   <SvgText

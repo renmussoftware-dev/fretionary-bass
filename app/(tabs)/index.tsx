@@ -11,9 +11,10 @@ import {
   NOTES, NOTE_DISPLAY,
   SCALES, POSITION_COLORS,
 } from '../../src/constants/music';
-import { useStore } from '../../src/store/useStore';
+import { useStore, SCALE_SPEED_MS, type ScalePlaybackSpeed } from '../../src/store/useStore';
 import { getScalePositions } from '../../src/utils/theory';
 import { useProGate } from '../../src/hooks/useProGate';
+import { useAudioEngine } from '../../src/hooks/useAudioEngine';
 import { isScaleFree, isChordFree } from '../../src/constants/subscription';
 import { OVERLAY_CHORDS } from '../../src/utils/overlay';
 
@@ -28,6 +29,8 @@ export default function FretboardScreen() {
   const { width: screenW } = useWindowDimensions();
   const isTablet = screenW >= 768;
   const { isPro, requirePro } = useProGate();
+  const { playScale, stopScale } = useAudioEngine();
+  const [playingScale, setPlayingScale] = React.useState(false);
 
   const {
     mode, root, scaleKey, setScaleKey,
@@ -35,6 +38,53 @@ export default function FretboardScreen() {
     activePosition, setActivePosition,
     customNotes, toggleCustomNote, clearCustomNotes,
   } = useStore();
+  const setPlaybackHighlight = useStore(s => s.setPlaybackHighlight);
+  const scalePlaybackSpeed = useStore(s => s.scalePlaybackSpeed);
+  const setScalePlaybackSpeed = useStore(s => s.setScalePlaybackSpeed);
+
+  // Playback is free for the scales the free tier can already select — locking
+  // it there too would punish the user twice for the same paywall.
+  const scalePlaybackLocked = !isPro && !isScaleFree(scaleKey);
+
+  // Build the scale as MIDI and play the practice pattern: two octaves up then
+  // back down to the root. Bass register — start at C1 + root and rise two
+  // octaves (max B3 = 59), which stays inside the real sample range (C1–D#4).
+  // Tap-again-to-stop.
+  function handlePlayScale() {
+    if (playingScale) {
+      stopScale();
+      setPlayingScale(false);
+      setPlaybackHighlight(null);
+      return;
+    }
+    const apply = () => {
+      const sc = SCALES[scaleKey];
+      if (!sc) return;
+      const startMidi = 24 + root; // C1 + root
+      const ascending: number[] = [startMidi];
+      let cur = startMidi;
+      for (let octave = 0; octave < 2; octave++) {
+        for (const stepIv of sc.steps) {
+          cur += stepIv;
+          ascending.push(cur);
+        }
+      }
+      const descending = ascending.slice(0, -1).reverse();
+      const notes = [...ascending, ...descending];
+      setPlayingScale(true);
+      playScale(
+        notes,
+        SCALE_SPEED_MS[scalePlaybackSpeed],
+        (idx) => setPlaybackHighlight(notes[idx] % 12),
+        () => {
+          setPlaybackHighlight(null);
+          setPlayingScale(false);
+        },
+      );
+    };
+    if (scalePlaybackLocked) { requirePro(apply); return; }
+    apply();
+  }
 
   const positions = mode === 'scales' ? getScalePositions(root, scaleKey) : [];
 
@@ -84,6 +134,29 @@ export default function FretboardScreen() {
                 );
               })}
             </ScrollView>
+            {/* Speed selector + Play — hear the scale across two octaves with
+                each sounding note lit up on the neck. */}
+            <View style={styles.speedRow}>
+              <Text style={styles.speedLabel}>Speed</Text>
+              {(['slow', 'normal', 'fast'] as ScalePlaybackSpeed[]).map(sp => {
+                const active = scalePlaybackSpeed === sp;
+                return (
+                  <TouchableOpacity key={sp}
+                    onPress={() => setScalePlaybackSpeed(sp)}
+                    style={[styles.speedPill, active && styles.speedPillActive]}
+                    activeOpacity={0.7}>
+                    <Text style={[styles.speedPillText, active && styles.speedPillTextActive]}>
+                      {sp === 'slow' ? 'Slow' : sp === 'normal' ? 'Normal' : 'Fast'}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+            <TouchableOpacity onPress={handlePlayScale} style={styles.playScaleBtn} activeOpacity={0.85}>
+              <Text style={styles.playScaleBtnText}>
+                {scalePlaybackLocked ? '🔒  ' : ''}{playingScale ? '⏸  Stop' : '▶  Hear scale'}
+              </Text>
+            </TouchableOpacity>
           </View>
         )}
         {/* Arpeggio (chord-tone) selector */}
@@ -251,6 +324,38 @@ const styles = StyleSheet.create({
   },
   pillLocked: {
     opacity: 0.5,
+  },
+  speedRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: SPACE.md,
+    paddingHorizontal: SPACE.lg,
+  },
+  speedLabel: {
+    fontSize: 11, fontWeight: '600', color: COLORS.textMuted,
+    marginRight: 4, letterSpacing: 0.3, textTransform: 'uppercase',
+  },
+  speedPill: {
+    paddingHorizontal: 12, paddingVertical: 5,
+    borderRadius: RADIUS.full,
+    borderWidth: 1, borderColor: COLORS.border,
+    backgroundColor: COLORS.bg,
+  },
+  speedPillActive: { backgroundColor: COLORS.accentSoft, borderColor: COLORS.accent },
+  speedPillText: { fontSize: 12, fontWeight: '600', color: COLORS.textMuted },
+  speedPillTextActive: { color: COLORS.text },
+  playScaleBtn: {
+    alignSelf: 'center',
+    marginTop: SPACE.md,
+    marginHorizontal: SPACE.lg,
+    paddingHorizontal: 28, paddingVertical: 11,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.accent,
+  },
+  playScaleBtnText: {
+    fontSize: 14, fontWeight: '700', color: '#fff', letterSpacing: 0.2,
   },
   customHeader: {
     flexDirection: 'row',

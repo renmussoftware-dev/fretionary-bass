@@ -49,6 +49,7 @@ export function rowFretToMidi(tuningId: string, rowString: number, fret: number)
 
 export function useAudioEngine() {
   const soundsRef = useRef<Record<number, Sound>>({});
+  const scaleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     async function loadAll() {
@@ -85,6 +86,7 @@ export function useAudioEngine() {
 
     return () => {
       Object.values(soundsRef.current).forEach(s => s.unloadAsync());
+      if (scaleTimerRef.current) clearTimeout(scaleTimerRef.current);
     };
   }, []);
 
@@ -126,5 +128,33 @@ export function useAudioEngine() {
     return playMidi(rowFretToMidi(tuningId, rowString, fret));
   }, [playMidi]);
 
-  return { playMidi, playFret };
+  const stopScale = useCallback(() => {
+    if (scaleTimerRef.current) {
+      clearTimeout(scaleTimerRef.current);
+      scaleTimerRef.current = null;
+    }
+  }, []);
+
+  // Play a sequence of single MIDI notes (scale playback). onStep fires the
+  // index of the note about to sound; onFinish fires after the last note.
+  // Starting a new sequence cancels any running one.
+  const playScale = useCallback((
+    midiNotes: number[],
+    msPerNote: number,
+    onStep: (index: number) => void,
+    onFinish: () => void,
+  ) => {
+    stopScale();
+    let idx = 0;
+    function step() {
+      if (idx >= midiNotes.length) { onFinish(); return; }
+      onStep(idx);
+      playMidi(midiNotes[idx]);
+      idx++;
+      scaleTimerRef.current = setTimeout(step, msPerNote);
+    }
+    step();
+  }, [playMidi, stopScale]);
+
+  return { playMidi, playFret, playScale, stopScale };
 }
