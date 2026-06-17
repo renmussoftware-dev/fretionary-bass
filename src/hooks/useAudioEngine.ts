@@ -41,6 +41,13 @@ function rateForShift(targetMidi: number, sampleMidi: number): number {
   return Math.pow(2, (targetMidi - sampleMidi) / 12);
 }
 
+// Scale playback envelope. SEQ_OVERLAP_MS: how long the previous note rings
+// into the next (a little legato so it isn't choppy). SEQ_RELEASE_MS: how long
+// the final note holds before it's cut — otherwise it sustains the full
+// multi-second sample.
+const SEQ_OVERLAP_MS = 130;
+const SEQ_RELEASE_MS = 1100;
+
 /** MIDI for a fret on a render-row string (0 = highest string) of a tuning. */
 export function rowFretToMidi(tuningId: string, rowString: number, fret: number): number {
   const open = [...getTuning(tuningId).midi].reverse(); // low→high → high→low rows
@@ -148,17 +155,23 @@ export function useAudioEngine() {
     }
     if (!sound) return;
 
-    // Cut the previous note (skip if it's the same Sound — the retrigger
-    // below already restarts it from the top).
+    // Legato: let the previous (different) note ring a touch into this one,
+    // then cut it. The guard means we never cut a Sound that's since been
+    // reused as the current note.
     const prev = lastSeqSoundRef.current;
-    if (prev && prev !== sound) prev.stopAsync().catch(() => {});
+    if (prev && prev !== sound) {
+      setTimeout(() => {
+        if (lastSeqSoundRef.current !== prev) prev.stopAsync().catch(() => {});
+      }, SEQ_OVERLAP_MS);
+    }
     lastSeqSoundRef.current = sound;
 
     const rate = rateForShift(midi, base);
     try {
-      await sound.setStatusAsync({
-        positionMillis: 0, rate, shouldCorrectPitch: false, shouldPlay: true,
-      });
+      // replayAsync restarts cleanly from the top (full attack), even if the
+      // same Sound is still ringing from a previous note.
+      await sound.setRateAsync(rate, false);
+      await sound.replayAsync();
     } catch {
       // ignore playback errors
     }
@@ -187,7 +200,20 @@ export function useAudioEngine() {
     stopScale();
     let idx = 0;
     function step() {
-      if (idx >= midiNotes.length) { onFinish(); return; }
+      if (idx >= midiNotes.length) {
+        // Sequence done: hold the final note briefly, then cut it so it
+        // doesn't trail the full sample. Guarded against a restart.
+        const finalSound = lastSeqSoundRef.current;
+        scaleTimerRef.current = setTimeout(() => {
+          if (finalSound && lastSeqSoundRef.current === finalSound) {
+            finalSound.stopAsync().catch(() => {});
+            lastSeqSoundRef.current = null;
+          }
+          scaleTimerRef.current = null;
+        }, SEQ_RELEASE_MS);
+        onFinish();
+        return;
+      }
       onStep(idx);
       playMidiSeq(midiNotes[idx]);
       idx++;
