@@ -14,7 +14,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.renmussoftware.fretionarybass",
-      "buildNumber": "13",
+      "buildNumber": "14",
       "infoPlist": {
         "UIBackgroundModes": [],
         "ITSAppUsesNonExemptEncryption": false,
