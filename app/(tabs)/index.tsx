@@ -138,7 +138,7 @@ export default function FretboardScreen() {
                 each sounding note lit up on the neck. */}
             <View style={styles.speedRow}>
               <Text style={styles.speedLabel}>Speed</Text>
-              {(['slow', 'normal', 'fast'] as ScalePlaybackSpeed[]).map(sp => {
+              {(['slow', 'normal'] as ScalePlaybackSpeed[]).map(sp => {
                 const active = scalePlaybackSpeed === sp;
                 return (
                   <TouchableOpacity key={sp}
@@ -146,7 +146,7 @@ export default function FretboardScreen() {
                     style={[styles.speedPill, active && styles.speedPillActive]}
                     activeOpacity={0.7}>
                     <Text style={[styles.speedPillText, active && styles.speedPillTextActive]}>
-                      {sp === 'slow' ? 'Slow' : sp === 'normal' ? 'Normal' : 'Fast'}
+                      {sp === 'slow' ? 'Slow' : 'Normal'}
                     </Text>
                   </TouchableOpacity>
                 );
