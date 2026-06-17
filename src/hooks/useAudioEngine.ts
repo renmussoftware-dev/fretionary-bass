@@ -50,6 +50,7 @@ export function rowFretToMidi(tuningId: string, rowString: number, fret: number)
 export function useAudioEngine() {
   const soundsRef = useRef<Record<number, Sound>>({});
   const scaleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastSeqSoundRef = useRef<Sound | null>(null);
 
   useEffect(() => {
     async function loadAll() {
@@ -128,10 +129,49 @@ export function useAudioEngine() {
     return playMidi(rowFretToMidi(tuningId, rowString, fret));
   }, [playMidi]);
 
+  // Monophonic note for sequenced playback: stop the previous note before the
+  // next one sounds so a fast scale doesn't pile up into overlapping sustain
+  // (bass samples ring for seconds — that mud is what we're avoiding here).
+  const playMidiSeq = useCallback(async (midi: number) => {
+    const base = nearestSample(midi);
+    let sound = soundsRef.current[base];
+    if (!sound && SAMPLE_FILES[base]) {
+      try {
+        const { sound: s } = await Audio.Sound.createAsync(
+          SAMPLE_FILES[base], { shouldPlay: false, volume: 1.0, shouldCorrectPitch: false },
+        );
+        soundsRef.current[base] = s;
+        sound = s;
+      } catch {
+        return;
+      }
+    }
+    if (!sound) return;
+
+    // Cut the previous note (skip if it's the same Sound — the retrigger
+    // below already restarts it from the top).
+    const prev = lastSeqSoundRef.current;
+    if (prev && prev !== sound) prev.stopAsync().catch(() => {});
+    lastSeqSoundRef.current = sound;
+
+    const rate = rateForShift(midi, base);
+    try {
+      await sound.setStatusAsync({
+        positionMillis: 0, rate, shouldCorrectPitch: false, shouldPlay: true,
+      });
+    } catch {
+      // ignore playback errors
+    }
+  }, []);
+
   const stopScale = useCallback(() => {
     if (scaleTimerRef.current) {
       clearTimeout(scaleTimerRef.current);
       scaleTimerRef.current = null;
+    }
+    if (lastSeqSoundRef.current) {
+      lastSeqSoundRef.current.stopAsync().catch(() => {});
+      lastSeqSoundRef.current = null;
     }
   }, []);
 
@@ -149,12 +189,12 @@ export function useAudioEngine() {
     function step() {
       if (idx >= midiNotes.length) { onFinish(); return; }
       onStep(idx);
-      playMidi(midiNotes[idx]);
+      playMidiSeq(midiNotes[idx]);
       idx++;
       scaleTimerRef.current = setTimeout(step, msPerNote);
     }
     step();
-  }, [playMidi, stopScale]);
+  }, [playMidiSeq, stopScale]);
 
   return { playMidi, playFret, playScale, stopScale };
 }
