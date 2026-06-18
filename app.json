@@ -14,7 +14,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.renmussoftware.fretionarybass",
-      "buildNumber": "14",
+      "buildNumber": "15",
       "infoPlist": {
         "UIBackgroundModes": [],
         "ITSAppUsesNonExemptEncryption": false,
@@ -72,7 +72,7 @@
         "react-native-fbsdk-next",
         {
           "appID": "1718755715795613",
-          "clientToken": "PLACEHOLDER_META_CLIENT_TOKEN",
+          "clientToken": "4281e7affa5b7b36fa2674253688703c",
           "displayName": "Fretionary Bass",
           "scheme": "fb1718755715795613",
           "advertiserIDCollectionEnabled": true,
@@ -90,8 +90,7 @@
       "router": {},
       "eas": {
         "projectId": "95aea364-4dd4-46b8-ae3a-909d8c352599"
-      },
-      "_note_fbsdk": "Meta appID 1718755715795613 is real; the fb<appID> URL scheme is now valid. STILL NEEDED: replace clientToken (PLACEHOLDER_META_CLIENT_TOKEN) with the real Client Token from Meta App Dashboard → App settings → Advanced → Security → Client token. The build/submit will pass without it, but app events won't send until it's set."
+      }
     },
     "owner": "renmussoftware"
   }
