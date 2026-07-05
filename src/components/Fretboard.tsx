@@ -13,6 +13,7 @@ import {
 } from '../utils/theory';
 import { useStore } from '../store/useStore';
 import { getTuning, tuningNoteClasses } from '../constants/tunings';
+import { useAudioEngine } from '../hooks/useAudioEngine';
 
 const TOTAL_FRETS = 15;
 const INLAY_FRETS = [3, 5, 7, 9, 12, 15];
@@ -39,6 +40,7 @@ export default function Fretboard() {
 
   const { root, scaleKey, chordKey, mode, labelMode, activePosition, tuningId, customNotes, toggleCustomNote } = useStore();
   const playbackHighlight = useStore(s => s.playbackHighlight);
+  const { playFret } = useAudioEngine();
 
   const activeTuning = getTuning(tuningId);
   const noteClasses = useMemo(() => tuningNoteClasses(activeTuning), [activeTuning]);
@@ -234,7 +236,7 @@ export default function Fretboard() {
             // toggles that pitch class into the custom set.
             if (!col) {
               return (
-                <G key={`${s}-${f}`} onPress={() => toggleCustomNote(ni)}>
+                <G key={`${s}-${f}`} onPress={() => { toggleCustomNote(ni); playFret(tuningId, s, f); }}>
                   <Circle cx={x} cy={y} r={DOT_R} fill="rgba(255,255,255,0.001)" />
                   <Circle
                     cx={x} cy={y} r={DOT_R * 0.42}
@@ -252,7 +254,8 @@ export default function Fretboard() {
             const isPlaying = playbackHighlight !== null && ni === playbackHighlight;
             const r = DOT_R * col.scale * (isPlaying ? 1.35 : 1);
             return (
-              <G key={`${s}-${f}`} opacity={col.opacity} onPress={isCustom ? () => toggleCustomNote(ni) : undefined}>
+              <G key={`${s}-${f}`} opacity={col.opacity}
+                onPress={() => { if (isCustom) toggleCustomNote(ni); playFret(tuningId, s, f); }}>
                 {col.isRoot && col.opacity === 1 && (
                   <Circle cx={x} cy={y} r={DOT_R + 6} fill="url(#rootGlow)" />
                 )}
