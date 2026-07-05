@@ -46,6 +46,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="practice"
+        options={{
+          title: 'Practice',
+          tabBarIcon: ({ color }) => <PracticeIcon color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="tools"
         options={{
           title: 'Tools',
@@ -77,6 +84,16 @@ function FretboardIcon({ color }: { color: string }) {
       {[0, 1, 2].map(i => (
         <View key={i} style={{ height: 1.5, backgroundColor: color, borderRadius: 1 }} />
       ))}
+    </View>
+  );
+}
+
+function PracticeIcon({ color }: { color: string }) {
+  // Concentric target — "drill / aim" semantics
+  return (
+    <View style={{ width: 18, height: 18, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ width: 18, height: 18, borderRadius: 9, borderWidth: 1.5, borderColor: color }} />
+      <View style={{ position: 'absolute', width: 6, height: 6, borderRadius: 3, backgroundColor: color }} />
     </View>
   );
 }

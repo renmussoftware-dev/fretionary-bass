@@ -38,3 +38,13 @@ export function isChordFree(chordKey: string): boolean {
 export function isTuningFree(tuningId: string): boolean {
   return FREE_TUNINGS.has(tuningId);
 }
+
+// ── PRACTICE ─────────────────────────────────────────────────────────────────
+// Free: only "Name the Note" at Beginner difficulty. Pro: other modes, harder
+// difficulties.
+export type PracticeMode = 'name' | 'find' | 'string';
+export type PracticeDifficulty = 'beginner' | 'intermediate' | 'advanced';
+
+export function isPracticeFree(mode: PracticeMode, difficulty: PracticeDifficulty): boolean {
+  return mode === 'name' && difficulty === 'beginner';
+}
