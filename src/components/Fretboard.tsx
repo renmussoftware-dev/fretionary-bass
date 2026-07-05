@@ -37,7 +37,7 @@ export default function Fretboard() {
   const DOT_R = isTablet ? 17 : 14;
   const SVG_W = LEFT_PAD + NUT_W + TOTAL_FRETS * FRET_W + 18;
 
-  const { root, scaleKey, chordKey, mode, labelMode, activePosition, tuningId, customNotes } = useStore();
+  const { root, scaleKey, chordKey, mode, labelMode, activePosition, tuningId, customNotes, toggleCustomNote } = useStore();
   const playbackHighlight = useStore(s => s.playbackHighlight);
 
   const activeTuning = getTuning(tuningId);
@@ -224,9 +224,26 @@ export default function Fretboard() {
           Array.from({ length: TOTAL_FRETS + 1 }, (_, f) => {
             const ni = (noteClasses[s] + f) % 12;
             const col = getNoteColor(ni, f);
-            if (!col) return null;
+            const isCustom = mode === 'custom';
+            if (!col && !isCustom) return null;
             const x = fretX(f);
             const y = strY(s);
+
+            // Custom mode: every unselected position is a faint, tappable
+            // "ghost" target so the whole neck acts as a note picker. Tapping
+            // toggles that pitch class into the custom set.
+            if (!col) {
+              return (
+                <G key={`${s}-${f}`} onPress={() => toggleCustomNote(ni)}>
+                  <Circle cx={x} cy={y} r={DOT_R} fill="rgba(255,255,255,0.001)" />
+                  <Circle
+                    cx={x} cy={y} r={DOT_R * 0.42}
+                    fill="rgba(255,255,255,0.05)"
+                    stroke="rgba(255,255,255,0.15)" strokeWidth={1}
+                  />
+                </G>
+              );
+            }
             const label = noteLabel(ni, root, labelMode, scaleKey, chordKey, mode);
             const fs = label.length > 2 ? 7 : 9;
             // When this pitch class is the one currently sounding in scale
@@ -235,7 +252,7 @@ export default function Fretboard() {
             const isPlaying = playbackHighlight !== null && ni === playbackHighlight;
             const r = DOT_R * col.scale * (isPlaying ? 1.35 : 1);
             return (
-              <G key={`${s}-${f}`} opacity={col.opacity}>
+              <G key={`${s}-${f}`} opacity={col.opacity} onPress={isCustom ? () => toggleCustomNote(ni) : undefined}>
                 {col.isRoot && col.opacity === 1 && (
                   <Circle cx={x} cy={y} r={DOT_R + 6} fill="url(#rootGlow)" />
                 )}

@@ -216,7 +216,7 @@ export default function FretboardScreen() {
               })}
             </ScrollView>
             <Text style={styles.customHint}>
-              Tap notes to highlight them on the fretboard. Use the root selector above to set your key — the root note is colored differently when included.
+              Tap a note here — or tap any fret on the board above — to add it. Use the root selector above to set your key; the root note is colored differently when included.
             </Text>
           </View>
         )}
