@@ -6,6 +6,7 @@ import { useStore, type AppMode } from '../store/useStore';
 import { useProGate } from '../hooks/useProGate';
 import TuningPicker from './TuningPicker';
 import SavedSheet from './SavedSheet';
+import HelpSheet from './HelpSheet';
 
 // Chord-tone / arpeggio work lives on the Overlay tab now (it owns everything
 // about playing over a chord), so the Fretboard's mode toggle is just the plain
@@ -115,6 +116,7 @@ export default function TopBar() {
   const { root, setRoot, scaleKey, mode, setMode } = useStore();
   const { isPro, requirePro } = useProGate();
   const [savedOpen, setSavedOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const titleSubject = mode === 'custom'
     ? `${NOTES[root]} Custom`
@@ -129,6 +131,15 @@ export default function TopBar() {
           <Text style={styles.title} numberOfLines={1}>{titleSubject}</Text>
         </View>
         <TuningPicker />
+        <TouchableOpacity
+          onPress={() => setHelpOpen(true)}
+          activeOpacity={0.7}
+          style={styles.helpBtn}
+          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+          accessibilityLabel="How to use the Fretboard"
+        >
+          <Text style={styles.helpBtnText}>?</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           onPress={() => setSavedOpen(true)}
           activeOpacity={0.7}
@@ -162,6 +173,7 @@ export default function TopBar() {
       </ScrollView>
 
       <SavedSheet visible={savedOpen} onClose={() => setSavedOpen(false)} />
+      <HelpSheet topic="fretboard" visible={helpOpen} onClose={() => setHelpOpen(false)} />
     </View>
   );
 }
@@ -196,6 +208,13 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   savedBtnText: { fontSize: 14, color: '#D45846', fontWeight: '700', lineHeight: 16 },
+  helpBtn: {
+    width: 32, height: 32, borderRadius: 16,
+    borderWidth: 1, borderColor: COLORS.border,
+    backgroundColor: COLORS.surface,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  helpBtnText: { fontSize: 16, color: COLORS.accent, fontWeight: '800', lineHeight: 18 },
   topRow: {
     flexDirection: 'row',
     alignItems: 'center',

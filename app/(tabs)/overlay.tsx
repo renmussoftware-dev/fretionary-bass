@@ -5,6 +5,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import OverlayFretboard from '../../src/components/OverlayFretboard';
 import TuningPicker from '../../src/components/TuningPicker';
+import HelpSheet from '../../src/components/HelpSheet';
 import { COLORS, SPACE, RADIUS, FONT_FAMILY } from '../../src/constants/theme';
 import { NOTES, NOTE_DISPLAY, CHORDS, COLORS as MUSIC_COLORS } from '../../src/constants/music';
 import { useStore } from '../../src/store/useStore';
@@ -49,6 +50,7 @@ export default function OverlayScreen() {
     overlayFret, setOverlayFret,
   } = useStore();
   const { isPro, requirePro } = useProGate();
+  const [helpOpen, setHelpOpen] = React.useState(false);
 
   const chord = CHORDS[chordKey];
   const activeChord = OVERLAY_CHORDS.find(c => c.key === chordKey);
@@ -76,6 +78,15 @@ export default function OverlayScreen() {
           </Text>
         </View>
         <TuningPicker />
+        <TouchableOpacity
+          onPress={() => setHelpOpen(true)}
+          activeOpacity={0.7}
+          style={styles.helpBtn}
+          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+          accessibilityLabel="How to use the Overlay"
+        >
+          <Text style={styles.helpBtnText}>?</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Root note selector */}
@@ -217,6 +228,8 @@ export default function OverlayScreen() {
 
         <View style={{ height: SPACE.xxl }} />
       </ScrollView>
+
+      <HelpSheet topic="overlay" visible={helpOpen} onClose={() => setHelpOpen(false)} />
     </SafeAreaView>
   );
 }
@@ -236,6 +249,13 @@ const styles = StyleSheet.create({
     fontSize: 20, fontWeight: '700',
     color: COLORS.text, letterSpacing: -0.2,
   },
+  helpBtn: {
+    width: 32, height: 32, borderRadius: 16,
+    borderWidth: 1, borderColor: COLORS.border,
+    backgroundColor: COLORS.surface,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  helpBtnText: { fontSize: 16, color: COLORS.accent, fontWeight: '800', lineHeight: 18 },
   // flexGrow:0 keeps this horizontal scroller from expanding to fill the
   // column's spare vertical space (which would stretch the pills tall).
   noteScroll: { flexGrow: 0, flexShrink: 0 },
