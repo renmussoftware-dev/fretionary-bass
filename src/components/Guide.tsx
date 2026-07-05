@@ -34,13 +34,12 @@ const SECTIONS: Section[] = [
   },
   {
     title: 'Fretboard',
-    intro: 'The plain reference neck. Where the Overlay answers “what do I play over this chord,” the Fretboard just maps a whole scale, a chord’s arpeggio, or your own notes across the neck — no scale underlay, no position lock. Color-coded by interval.',
+    intro: 'The plain reference neck. Where the Overlay answers “what do I play over this chord,” the Fretboard just maps a whole scale or your own notes across the neck — no scale underlay, no position lock. Color-coded by interval. (For a chord’s arpeggio, use the Overlay and toggle its scale underlay off.)',
     navTo: '/',
     navLabel: 'Open Fretboard',
     features: [
       { name: 'Scales mode', desc: 'A full scale or mode mapped across the neck, with auto-detected position boxes. Major, the modes, pentatonics, blues, harmonic/melodic minor.', badge: 'mixed' },
-      { name: 'Arpeggio mode', desc: 'Just the chord tones of any chord across the entire neck — the bare arpeggio, with no parent scale behind it.', badge: 'mixed' },
-      { name: 'Custom mode', desc: 'Hand-pick any set of notes to highlight on the neck.', badge: 'pro' },
+      { name: 'Custom mode', desc: 'Tap any fret — or the note pills — to hand-pick a set of notes to highlight on the neck.', badge: 'pro' },
       { name: 'Note labels', desc: 'Toggle between note name, scale degree, interval, or no label.', badge: 'free' },
     ],
   },

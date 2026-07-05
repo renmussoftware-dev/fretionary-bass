@@ -49,11 +49,12 @@ export default function SavedSheet({ visible, onClose }: Props) {
     if (it.kind === 'scale') {
       setScaleKey(it.scaleKey);
       setMode('scales');
+      router.push('/');
     } else {
+      // Chord-tone work lives on the Overlay tab now.
       setChordKey(it.chordKey);
-      setMode('chords');
+      router.push('/overlay' as any);
     }
-    router.push('/');
   }
 
   function handleClearRecents() {

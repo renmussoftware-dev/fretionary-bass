@@ -7,13 +7,12 @@ import { useProGate } from '../hooks/useProGate';
 import TuningPicker from './TuningPicker';
 import SavedSheet from './SavedSheet';
 
-// The 'chords' mode renders chord tones across the neck — i.e. an arpeggio —
-// so it's labeled "Arpeggio" for bass. Internal value stays 'chords' to avoid
-// churning the mode logic in the renderer and theory helpers.
+// Chord-tone / arpeggio work lives on the Overlay tab now (it owns everything
+// about playing over a chord), so the Fretboard's mode toggle is just the plain
+// reference neck: a full scale, or your own hand-picked notes.
 const MODES: { label: string; value: AppMode; pro?: boolean }[] = [
-  { label: 'Scales',   value: 'scales' },
-  { label: 'Arpeggio', value: 'chords' },
-  { label: 'Custom',   value: 'custom', pro: true },
+  { label: 'Scales', value: 'scales' },
+  { label: 'Custom', value: 'custom', pro: true },
 ];
 
 // Sliding indicator inside a segmented control. Animates between mode pills
@@ -113,15 +112,13 @@ const segStyles = StyleSheet.create({
 });
 
 export default function TopBar() {
-  const { root, setRoot, scaleKey, chordKey, mode, setMode } = useStore();
+  const { root, setRoot, scaleKey, mode, setMode } = useStore();
   const { isPro, requirePro } = useProGate();
   const [savedOpen, setSavedOpen] = useState(false);
 
-  const titleSubject = mode === 'chords'
-    ? `${NOTES[root]} ${chordKey}`
-    : mode === 'custom'
-      ? `${NOTES[root]} Custom`
-      : `${NOTES[root]} ${scaleKey}`;
+  const titleSubject = mode === 'custom'
+    ? `${NOTES[root]} Custom`
+    : `${NOTES[root]} ${scaleKey}`;
 
   return (
     <View style={styles.wrap}>

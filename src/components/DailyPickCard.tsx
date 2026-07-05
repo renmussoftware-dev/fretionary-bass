@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { router } from 'expo-router';
 import { COLORS, FONT_FAMILY, RADIUS, SPACE } from '../constants/theme';
 import { useStore } from '../store/useStore';
 import { getDailyPick } from '../utils/dailyPick';
@@ -9,8 +10,9 @@ import { getDailyPick } from '../utils/dailyPick';
  * deterministic daily pick — alternates scale/chord, rotates root and item
  * by date — and applies it to the fretboard on tap.
  *
- * Lives on the Fretboard tab (the natural scales/arpeggio surface). The chord
- * picks come from the bass v1 set, so "today's chord" always maps cleanly.
+ * Lives on the Fretboard tab. Scale picks apply in place; chord picks jump to
+ * the Overlay tab, which owns chord-tone work. Chords come from the bass v1
+ * set, so "today's chord" always maps cleanly.
  */
 export default function DailyPickCard() {
   const pick = useMemo(() => getDailyPick(), []);
@@ -26,8 +28,9 @@ export default function DailyPickCard() {
       setScaleKey(pick.itemKey);
       setMode('scales');
     } else {
+      // Chords live on the Overlay tab now — set it and jump there.
       setChordKey(pick.itemKey);
-      setMode('chords');
+      router.push('/overlay' as any);
     }
   }
 

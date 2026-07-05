@@ -15,8 +15,7 @@ import { useStore, SCALE_SPEED_MS, type ScalePlaybackSpeed } from '../../src/sto
 import { getScalePositions } from '../../src/utils/theory';
 import { useProGate } from '../../src/hooks/useProGate';
 import { useAudioEngine } from '../../src/hooks/useAudioEngine';
-import { isScaleFree, isChordFree } from '../../src/constants/subscription';
-import { OVERLAY_CHORDS } from '../../src/utils/overlay';
+import { isScaleFree } from '../../src/constants/subscription';
 
 const LABEL_OPTIONS = [
   { label: 'Note', value: 'name' },
@@ -33,11 +32,18 @@ export default function FretboardScreen() {
   const [playingScale, setPlayingScale] = React.useState(false);
 
   const {
-    mode, root, scaleKey, setScaleKey,
-    chordKey, setChordKey, labelMode, setLabelMode,
+    mode, setMode, root, scaleKey, setScaleKey,
+    labelMode, setLabelMode,
     activePosition, setActivePosition,
     customNotes, toggleCustomNote, clearCustomNotes,
   } = useStore();
+
+  // Arpeggio (chord-tone) work moved to the Overlay tab. Coerce any persisted
+  // 'chords' mode from an older build back to 'scales' so the Fretboard tab
+  // never lands on a mode it no longer exposes.
+  React.useEffect(() => {
+    if (mode === 'chords') setMode('scales');
+  }, [mode, setMode]);
   const setPlaybackHighlight = useStore(s => s.setPlaybackHighlight);
   const scalePlaybackSpeed = useStore(s => s.scalePlaybackSpeed);
   const setScalePlaybackSpeed = useStore(s => s.setScalePlaybackSpeed);
@@ -90,13 +96,6 @@ export default function FretboardScreen() {
 
   const scaleOptions = Object.keys(SCALES).map(k => ({
     label: k, value: k,
-  }));
-
-  // Arpeggio view: the v1 chord set only (triads, sus, 6ths, 7ths) — no 9/11/13
-  // or altered extensions. Bass arpeggios target chord tones, and extensions
-  // are out of v1 scope (spec §9). Single source of truth shared with the hero.
-  const chordOptions = OVERLAY_CHORDS.map(c => ({
-    label: c.label, value: c.key,
   }));
 
   const posOptions = [
@@ -157,28 +156,6 @@ export default function FretboardScreen() {
                 {scalePlaybackLocked ? '🔒  ' : ''}{playingScale ? '⏸  Stop' : '▶  Hear scale'}
               </Text>
             </TouchableOpacity>
-          </View>
-        )}
-        {/* Arpeggio (chord-tone) selector */}
-        {mode === 'chords' && (
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Arpeggio</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.pillRow}>
-              {chordOptions.map(opt => {
-                const locked = !isPro && !isChordFree(opt.value);
-                return (
-                  <TouchableOpacity key={opt.value}
-                    onPress={() => locked ? requirePro(() => setChordKey(opt.value)) : setChordKey(opt.value)}
-                    style={[styles.pill, chordKey === opt.value && styles.pillActive, locked && styles.pillLocked]}
-                    activeOpacity={0.7}>
-                    <Text style={[styles.pillText, chordKey === opt.value && styles.pillTextActive]}>
-                      {locked ? '🔒 ' : ''}{opt.label}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
           </View>
         )}
         {/* Custom note picker */}
