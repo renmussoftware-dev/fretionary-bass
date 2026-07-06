@@ -55,6 +55,7 @@ export default function ProgressionBar() {
 
   const [playing, setPlaying] = useState(false);
   const [showPresets, setShowPresets] = useState(false);
+  const [editing, setEditing] = useState(false);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const hasChords = progression.length > 0;
@@ -100,6 +101,8 @@ export default function ProgressionBar() {
   useEffect(() => { stop(); }, [progression.length]);
   // Clean up the timer if the tab unmounts mid-play.
   useEffect(() => () => { if (timer.current) clearInterval(timer.current); }, []);
+  // Leave edit mode automatically once there's nothing left to edit.
+  useEffect(() => { if (!hasChords && editing) setEditing(false); }, [hasChords, editing]);
   // Stop auto-play when the user leaves the Overlay tab — otherwise the loop
   // would keep changing the chord (and playing audio) on another screen.
   useFocusEffect(useCallback(() => () => stop(), []));
@@ -109,22 +112,35 @@ export default function ProgressionBar() {
       <View style={styles.toolbar}>
         <Text style={styles.label}>Progression</Text>
         <View style={styles.toolbarActions}>
-          {hasChords && (
-            <TouchableOpacity onPress={togglePlay} activeOpacity={0.8} style={styles.playBtn}>
-              <Text style={styles.playBtnText}>{playing ? '⏸  Stop' : '▶  Play'}</Text>
-            </TouchableOpacity>
-          )}
-          <TouchableOpacity
-            onPress={() => setShowPresets(v => !v)}
-            activeOpacity={0.7}
-            style={styles.ghostBtn}
-          >
-            <Text style={styles.ghostBtnText}>Presets{showPresets ? ' ▴' : ' ▾'}</Text>
-          </TouchableOpacity>
-          {hasChords && (
-            <TouchableOpacity onPress={() => { stop(); clearProgression(); }} activeOpacity={0.7} style={styles.ghostBtn}>
-              <Text style={styles.ghostBtnText}>Clear</Text>
-            </TouchableOpacity>
+          {editing ? (
+            <>
+              <TouchableOpacity onPress={() => { stop(); clearProgression(); }} activeOpacity={0.7} style={styles.ghostBtn}>
+                <Text style={styles.ghostBtnText}>Clear all</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setEditing(false)} activeOpacity={0.7} style={styles.doneBtn}>
+                <Text style={styles.doneBtnText}>Done</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              {hasChords && (
+                <TouchableOpacity onPress={togglePlay} activeOpacity={0.8} style={styles.playBtn}>
+                  <Text style={styles.playBtnText}>{playing ? '⏸  Stop' : '▶  Play'}</Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity
+                onPress={() => setShowPresets(v => !v)}
+                activeOpacity={0.7}
+                style={styles.ghostBtn}
+              >
+                <Text style={styles.ghostBtnText}>Presets{showPresets ? ' ▴' : ' ▾'}</Text>
+              </TouchableOpacity>
+              {hasChords && (
+                <TouchableOpacity onPress={() => { stop(); setEditing(true); }} activeOpacity={0.7} style={styles.ghostBtn}>
+                  <Text style={styles.ghostBtnText}>Edit</Text>
+                </TouchableOpacity>
+              )}
+            </>
           )}
         </View>
       </View>
@@ -146,28 +162,25 @@ export default function ProgressionBar() {
             return (
               <TouchableOpacity
                 key={`${i}-${c.root}-${c.chordKey}`}
-                onPress={() => { stop(); goTo(i, true); }}
+                onPress={() => editing ? removeProgressionChord(i) : (stop(), goTo(i, true))}
                 activeOpacity={0.8}
-                style={[styles.chip, active && styles.chipActive]}
+                style={[styles.chip, active && !editing && styles.chipActive, editing && styles.chipEditing]}
               >
-                <Text style={[styles.chipText, active && styles.chipTextActive]}>{chipLabel(c.root, c.chordKey)}</Text>
-                <TouchableOpacity
-                  onPress={() => removeProgressionChord(i)}
-                  hitSlop={{ top: 8, bottom: 8, left: 6, right: 8 }}
-                >
-                  <Text style={[styles.chipRemove, active && styles.chipTextActive]}>×</Text>
-                </TouchableOpacity>
+                {editing && <Text style={styles.chipRemove}>×</Text>}
+                <Text style={[styles.chipText, active && !editing && styles.chipTextActive]}>{chipLabel(c.root, c.chordKey)}</Text>
               </TouchableOpacity>
             );
           })}
-          <TouchableOpacity onPress={() => addProgressionChord(root, chordKey)} activeOpacity={0.7} style={styles.addChip}>
-            <Text style={styles.addChipText}>＋ {chipLabel(root, chordKey)}</Text>
-          </TouchableOpacity>
+          {!editing && (
+            <TouchableOpacity onPress={() => addProgressionChord(root, chordKey)} activeOpacity={0.7} style={styles.addChip}>
+              <Text style={styles.addChipText}>＋ {chipLabel(root, chordKey)}</Text>
+            </TouchableOpacity>
+          )}
         </ScrollView>
       ) : (
         <View style={styles.empty}>
           <Text style={styles.emptyText}>
-            Build a chord progression — the neck follows every change. Tap a preset above, or add the current chord:
+            Build a chord progression — the neck follows every change. Tap “Presets” above for a starting point, or add the current chord:
           </Text>
           <TouchableOpacity onPress={() => addProgressionChord(root, chordKey)} activeOpacity={0.7} style={styles.addChipLg}>
             <Text style={styles.addChipText}>＋ Add {chipLabel(root, chordKey)}</Text>
@@ -204,6 +217,11 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surface,
   },
   ghostBtnText: { fontSize: 12, fontWeight: '600', color: COLORS.textMuted },
+  doneBtn: {
+    paddingHorizontal: 14, paddingVertical: 6,
+    borderRadius: RADIUS.full, backgroundColor: COLORS.accent,
+  },
+  doneBtnText: { fontSize: 12, fontWeight: '700', color: '#fff', letterSpacing: 0.2 },
 
   presetRow: { flexDirection: 'row', gap: 6, paddingVertical: 2 },
   presetPill: {
@@ -223,9 +241,13 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: 'transparent',
   },
   chipActive: { backgroundColor: COLORS.accentSoft, borderColor: COLORS.accent },
+  chipEditing: {
+    backgroundColor: 'rgba(212,88,70,0.12)',
+    borderColor: 'rgba(212,88,70,0.55)',
+  },
   chipText: { fontSize: 14, fontWeight: '700', color: COLORS.textMuted, fontFamily: FONT_FAMILY.mono },
   chipTextActive: { color: COLORS.text },
-  chipRemove: { fontSize: 15, fontWeight: '700', color: COLORS.textFaint, lineHeight: 16 },
+  chipRemove: { fontSize: 16, fontWeight: '800', color: '#D45846', lineHeight: 16, marginRight: 1 },
 
   addChip: {
     paddingHorizontal: 12, paddingVertical: 8,
