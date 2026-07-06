@@ -47,11 +47,15 @@ const CONTENT: Record<HelpTopic, Content> = {
   overlay: {
     title: 'How to use the Overlay',
     intro:
-      'This screen tells you what to play over a single chord — handy for jamming along or writing a bass line.',
+      'This screen tells you what to play over a chord — or a whole chord progression — so you can jam along or write a bass line.',
     steps: [
       {
         heading: 'Pick the chord',
         body: 'Choose a root note and a chord type (like C Major). This is the chord you’re playing over.',
+      },
+      {
+        heading: 'Build a progression',
+        body: 'Add chords to the Progression bar, or tap a preset like “I–IV–V”. Tap any chord to jump to it, or press Play to move through them while the neck follows along.',
       },
       {
         heading: 'Play the bright dots',

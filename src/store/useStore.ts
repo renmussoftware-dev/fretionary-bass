@@ -50,6 +50,9 @@ export const SCALE_SPEED_MS: Record<ScalePlaybackSpeed, number> = {
   fast:   150,
 };
 
+// One step in a chord progression: an absolute root pitch class + chord key.
+export type ProgressionChord = { root: number; chordKey: string };
+
 export type SavedItem =
   | { kind: 'scale'; root: number; scaleKey: string; addedAt: number }
   | { kind: 'chord'; root: number; chordKey: string; addedAt: number };
@@ -87,6 +90,19 @@ interface AppState {
   overlayFret: number | null;
   setOverlayUnderlay: (v: boolean) => void;
   setOverlayFret: (f: number | null) => void;
+
+  // ── Chord progression (feeds the overlay) ──────────────────────────────────
+  // progression: the ordered chords. progressionIndex: which step is currently
+  // "active" and driving the overlay (-1 = none / user has diverged manually).
+  // selectProgressionStep sets root+chordKey together WITHOUT going through
+  // setRoot/setChordKey, so it doesn't trip the manual-divergence reset below.
+  progression: ProgressionChord[];
+  progressionIndex: number;
+  setProgression: (p: ProgressionChord[]) => void;
+  addProgressionChord: (root: number, chordKey: string) => void;
+  removeProgressionChord: (index: number) => void;
+  clearProgression: () => void;
+  selectProgressionStep: (index: number) => void;
 
   // ── Scale playback ─────────────────────────────────────────────────────────
   // playbackHighlight: pitch class (0–11) currently sounding, or null. The
@@ -162,6 +178,29 @@ export const useStore = create<AppState>()(
       setOverlayUnderlay: (overlayUnderlay) => set({ overlayUnderlay }),
       setOverlayFret: (overlayFret) => set({ overlayFret }),
 
+      progression: [],
+      progressionIndex: -1,
+      setProgression: (progression) => set({ progression, progressionIndex: -1 }),
+      addProgressionChord: (root, chordKey) => {
+        const next = [...get().progression, { root, chordKey }];
+        // Highlight the freshly added chord (it already matches the overlay).
+        set({ progression: next, progressionIndex: next.length - 1 });
+      },
+      removeProgressionChord: (index) => {
+        const next = get().progression.filter((_, i) => i !== index);
+        const idx = get().progressionIndex;
+        set({
+          progression: next,
+          progressionIndex: idx >= next.length ? -1 : idx,
+        });
+      },
+      clearProgression: () => set({ progression: [], progressionIndex: -1 }),
+      selectProgressionStep: (index) => {
+        const step = get().progression[index];
+        if (!step) return;
+        set({ root: step.root, chordKey: step.chordKey, progressionIndex: index });
+      },
+
       playbackHighlight: null,
       scalePlaybackSpeed: 'normal',
       setPlaybackHighlight: (playbackHighlight) => set({ playbackHighlight }),
@@ -223,9 +262,11 @@ export const useStore = create<AppState>()(
           });
       },
 
-      setRoot: (root) => set({ root }),
+      // Manually changing the root or chord means the user has stepped off the
+      // progression, so drop the active-step highlight.
+      setRoot: (root) => set({ root, progressionIndex: -1 }),
       setScaleKey: (scaleKey) => set({ scaleKey, activePosition: null }),
-      setChordKey: (chordKey) => set({ chordKey }),
+      setChordKey: (chordKey) => set({ chordKey, progressionIndex: -1 }),
       setMode: (mode) => set({ mode, activePosition: null }),
       setLabelMode: (labelMode) => set({ labelMode }),
       setActivePosition: (activePosition) => set({ activePosition }),
@@ -278,6 +319,7 @@ export const useStore = create<AppState>()(
         labelMode: s.labelMode,
         overlayUnderlay: s.overlayUnderlay,
         scalePlaybackSpeed: s.scalePlaybackSpeed,
+        progression: s.progression,
         favorites: s.favorites,
         recents: s.recents,
         customNotes: s.customNotes,

@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import OverlayFretboard from '../../src/components/OverlayFretboard';
 import TuningPicker from '../../src/components/TuningPicker';
 import HelpSheet from '../../src/components/HelpSheet';
+import ProgressionBar from '../../src/components/ProgressionBar';
 import { COLORS, SPACE, RADIUS, FONT_FAMILY } from '../../src/constants/theme';
 import { NOTES, NOTE_DISPLAY, CHORDS, COLORS as MUSIC_COLORS } from '../../src/constants/music';
 import { useStore } from '../../src/store/useStore';
@@ -88,6 +89,9 @@ export default function OverlayScreen() {
           <Text style={styles.helpBtnText}>?</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Chord progression — drives the overlay; tap a chord or press Play */}
+      <ProgressionBar />
 
       {/* Root note selector */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false}
