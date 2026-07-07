@@ -9,9 +9,8 @@ import { useStore } from '../store/useStore';
 import { linkFacebookAnonymousIDToRevenueCat } from '../utils/analytics';
 
 // RevenueCat public SDK keys (safe to ship in the binary).
-// iOS: real. Android: still a placeholder — set the goog_… key before Android ships.
 const REVENUECAT_API_KEY_IOS = 'appl_cGHuCyDdGmLNVmAjEALhBqrbEVt';
-const REVENUECAT_API_KEY_ANDROID = 'PLACEHOLDER_REVENUECAT_ANDROID_KEY';
+const REVENUECAT_API_KEY_ANDROID = 'goog_FYSilgeGBrfsKSQDRZLrIIuIPqf';
 const ENTITLEMENT_ID = 'Renmus Software LLC Pro';
 
 export interface PurchaseState {
