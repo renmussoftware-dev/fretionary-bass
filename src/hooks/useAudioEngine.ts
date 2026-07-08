@@ -1,13 +1,32 @@
 import { useEffect, useRef, useCallback } from 'react';
+import { Platform } from 'react-native';
 import { Audio } from 'expo-av';
 import { Sound } from 'expo-av/build/Audio';
+import { Asset } from 'expo-asset';
 import { getTuning } from '../constants/tunings';
+// Android-only low-latency playback via native SoundPool. On iOS (and in
+// Android Expo Go, where the native module isn't present) these helpers no-op /
+// report unavailable and we fall back to the expo-av path below. See
+// modules/fretionary-sound-pool/ for the Kotlin implementation.
+import {
+  loadSound as soundPoolLoad,
+  playSound as soundPoolPlay,
+  stopAllSounds as soundPoolStopAll,
+  unloadAllSounds as soundPoolUnloadAll,
+  isSoundPoolAvailable,
+} from '../../modules/fretionary-sound-pool/src/FretionarySoundPoolModule';
+
+// Route Android through SoundPool only when the native module is actually
+// linked (a dev/production build). expo-av's setStatusAsync-per-note path
+// stutters badly on Android during scale playback; SoundPool fixes it.
+const USE_SOUND_POOL = Platform.OS === 'android' && isSoundPoolAvailable;
 
 // ── Bass sample set (Jay-Bass Vintage Lite V2) ───────────────────────────────
 // Real recorded samples every 3 semitones, scientific pitch notation
 // (verified by FFT: C1 = MIDI 24, A2 = MIDI 45, …). Files are renamed to
-// `bass-<midi>.wav`. Any target note is at most 1 semitone from a sample
-// (except a few above the top sample), so pitch-shifting stays clean.
+// `bass-<midi>.wav` (16-bit mono, so SoundPool decodes them on every device).
+// Any target note is at most 1 semitone from a sample (except a few above the
+// top sample), so pitch-shifting stays clean.
 //
 // Metro needs static requires, so the map is spelled out literally.
 const SAMPLE_FILES: Record<number, any> = {
@@ -54,6 +73,26 @@ export function useAudioEngine() {
 
   useEffect(() => {
     async function loadAll() {
+      if (USE_SOUND_POOL) {
+        // Android: decode every sample into the native SoundPool. downloadAsync
+        // materializes the bundled asset to a local file path (no network) that
+        // SoundPool.load can read. The sample "name" is the base MIDI as a
+        // string, matched by playMidi below.
+        await Promise.all(
+          Object.entries(SAMPLE_FILES).map(async ([midi, src]) => {
+            try {
+              const asset = Asset.fromModule(src);
+              await asset.downloadAsync();
+              if (asset.localUri) await soundPoolLoad(midi, asset.localUri);
+            } catch {
+              // skip a sample that fails to load
+            }
+          }),
+        );
+        return;
+      }
+
+      // iOS (and Android Expo Go fallback): expo-av pool with rate-based shift.
       await Audio.setAudioModeAsync({
         playsInSilentModeIOS: true,
         allowsRecordingIOS: false,
@@ -86,7 +125,11 @@ export function useAudioEngine() {
     loadAll();
 
     return () => {
-      Object.values(soundsRef.current).forEach(s => s.unloadAsync());
+      if (USE_SOUND_POOL) {
+        soundPoolUnloadAll();
+      } else {
+        Object.values(soundsRef.current).forEach(s => s.unloadAsync());
+      }
       if (scaleTimerRef.current) clearTimeout(scaleTimerRef.current);
     };
   }, []);
@@ -96,8 +139,16 @@ export function useAudioEngine() {
   // shifts naturally like a real string fretted up or down.
   const playMidi = useCallback(async (midi: number) => {
     const base = nearestSample(midi);
-    let sound = soundsRef.current[base];
+    const rate = rateForShift(midi, base);
 
+    if (USE_SOUND_POOL) {
+      // One synchronous native call — starts the voice on the audio thread
+      // immediately, and concurrent taps allocate fresh voices (polyphonic).
+      soundPoolPlay(String(base), rate);
+      return;
+    }
+
+    let sound = soundsRef.current[base];
     if (!sound && SAMPLE_FILES[base]) {
       try {
         const { sound: s } = await Audio.Sound.createAsync(
@@ -111,7 +162,6 @@ export function useAudioEngine() {
     }
     if (!sound) return;
 
-    const rate = rateForShift(midi, base);
     try {
       await sound.setStatusAsync({
         positionMillis: 0,
@@ -129,11 +179,21 @@ export function useAudioEngine() {
     return playMidi(rowFretToMidi(tuningId, rowString, fret));
   }, [playMidi]);
 
-  // Monophonic note for sequenced playback: stop the previous note before the
+  // Monophonic note for sequenced playback: cut the previous note before the
   // next one sounds so a fast scale doesn't pile up into overlapping sustain
   // (bass samples ring for seconds — that mud is what we're avoiding here).
   const playMidiSeq = useCallback(async (midi: number) => {
     const base = nearestSample(midi);
+    const rate = rateForShift(midi, base);
+
+    if (USE_SOUND_POOL) {
+      // Halt the previous voice, then fire the next — a clean monophonic scale
+      // with none of the expo-av per-note bridge latency that stutters.
+      soundPoolStopAll();
+      soundPoolPlay(String(base), rate);
+      return;
+    }
+
     let sound = soundsRef.current[base];
     if (!sound && SAMPLE_FILES[base]) {
       try {
@@ -154,7 +214,6 @@ export function useAudioEngine() {
     if (prev && prev !== sound) prev.stopAsync().catch(() => {});
     lastSeqSoundRef.current = sound;
 
-    const rate = rateForShift(midi, base);
     try {
       await sound.setStatusAsync({
         positionMillis: 0, rate, shouldCorrectPitch: false, shouldPlay: true,
@@ -168,6 +227,10 @@ export function useAudioEngine() {
     if (scaleTimerRef.current) {
       clearTimeout(scaleTimerRef.current);
       scaleTimerRef.current = null;
+    }
+    if (USE_SOUND_POOL) {
+      soundPoolStopAll();
+      return;
     }
     if (lastSeqSoundRef.current) {
       lastSeqSoundRef.current.stopAsync().catch(() => {});
