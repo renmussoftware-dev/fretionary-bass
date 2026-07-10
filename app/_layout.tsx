@@ -18,14 +18,19 @@ import { useStore, PAYWALL_PROMPT_MIN_ACTIONS } from '../src/store/useStore';
 import { maybeRequestPushPermission, scheduleStreakReminder } from '../src/utils/notifications';
 
 const ONBOARDING_KEY = 'fretionary_bass_onboarded_v1';
-const PROACTIVE_PAYWALL_DELAY_MS = 800;
+// Small delay after onboarding wraps so the Stack navigator has time to
+// mount before we router.push the paywall route. Also feels less abrupt
+// than jamming the paywall in the same frame as the onboarding dismissal.
+const FIRST_LAUNCH_PAYWALL_DELAY_MS = 800;
 
 export default function RootLayout() {
   const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null);
 
   // Reactive store reads — when isPro flips after RevenueCat loads, the
-  // proactive-paywall effect re-evaluates and bails. positiveActionCount
-  // and paywallPromptShownAt drive the show-once trigger.
+  // first-launch-paywall effect re-evaluates and bails. paywallPromptShownAt
+  // drives the show-once trigger; positiveActionCount is still consumed by
+  // the push-permission gate below (we don't want to bombard fresh users
+  // with system prompts on first launch).
   const isPro = useStore(s => s.isPro);
   const positiveActionCount = useStore(s => s.positiveActionCount);
   const paywallPromptShownAt = useStore(s => s.paywallPromptShownAt);
@@ -102,29 +107,29 @@ export default function RootLayout() {
     scheduleStreakReminder(currentStreak);
   }, [showOnboarding, currentStreak]);
 
-  // Proactive paywall — surface the offer once after the user has shown real
-  // engagement (favorited PAYWALL_PROMPT_MIN_ACTIONS items), instead of
-  // waiting for them to bump into a Pro-gated feature. Free-tier users who
-  // never trip a Pro gate otherwise never see the paywall at all, which was
-  // a major leak in the install→purchase funnel. Single-shot, persisted via
-  // paywallPromptShownAt.
+  // First-launch paywall — surface the Pro offer once, immediately after
+  // onboarding wraps up. Free-tier users who never trip a Pro gate otherwise
+  // never see the paywall at all, which was a major leak in the
+  // install→purchase funnel. Single-shot, persisted via paywallPromptShownAt
+  // so a user who declines never gets re-prompted (they'll still hit the
+  // paywall the normal way if they tap a Pro-gated feature).
   //
-  // Effect re-runs when isPro / positiveActionCount / paywallPromptShownAt
-  // change. Cleanup clearTimeout debounces multiple state changes within
-  // the delay window so we never present the paywall twice. If RevenueCat
-  // resolves isPro=true mid-delay, the cleanup cancels the pending show.
+  // Effect re-runs when showOnboarding / isPro / paywallPromptShownAt change.
+  // The delay gives the Stack a beat to mount after showOnboarding flips to
+  // false so router.push has a target. If RevenueCat resolves isPro=true
+  // mid-delay (existing subscriber restore during init), the cleanup cancels
+  // the pending push.
   useEffect(() => {
     if (showOnboarding !== false) return;
     if (isPro) return;
     if (paywallPromptShownAt !== null) return;
-    if (positiveActionCount < PAYWALL_PROMPT_MIN_ACTIONS) return;
 
     const t = setTimeout(() => {
       markPaywallPromptShown();
       router.push('/paywall');
-    }, PROACTIVE_PAYWALL_DELAY_MS);
+    }, FIRST_LAUNCH_PAYWALL_DELAY_MS);
     return () => clearTimeout(t);
-  }, [showOnboarding, isPro, positiveActionCount, paywallPromptShownAt, markPaywallPromptShown]);
+  }, [showOnboarding, isPro, paywallPromptShownAt, markPaywallPromptShown]);
 
   async function finishOnboarding() {
     // Prompt ATT now — user has just seen the value, this is the natural
